@@ -1,0 +1,23 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.letter{
+  display: flex;
+  text-align: center;
+  width: 150px;
+}
+.gameBorder{
+  display: flex;
+  flex-direction: row;
+  
+}
+
+.wordDisplay{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly
+}
