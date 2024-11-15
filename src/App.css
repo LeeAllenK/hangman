@@ -19,5 +19,6 @@
 .wordDisplay{
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly
+  justify-content: space-evenly;
+  padding: 120px;
 }
