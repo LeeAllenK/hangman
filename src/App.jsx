@@ -1,8 +1,8 @@
 import { useState} from 'react'
 
-import {PickLetterBtn} from './components/PickLetterBtn'
-import {ResetBtn} from './components/ResetBtn'
-import {HomeBtn} from './components/HomeBtn'
+import {PickLetterBtn} from './components/Buttons.jsx/PickLetterBtn'
+import {ResetBtn} from './components/Buttons.jsx/ResetBtn'
+import {HomeBtn} from './components/Buttons.jsx/HomeBtn'
 import './App.css'
 
 let categories = {
@@ -31,13 +31,12 @@ let c = categories.car
 let randomC = Math.floor(Math.random() * categories.car.length )
 let randomF = Math.floor(Math.random() * categories.car.length )
 let randomT = Math.floor(Math.random() * categories.car.length )
-  
+
  let Cars = categories.car[randomC].split('');
  let Food = categories.food[randomF].split('');
  let Tech = categories.phones[randomT].split('');
 
 let alpha = 'abcdefghijklmnopqrstuvwxyz';
-
 
 function Category({onShow , children ,isActive ,disabled, isShowing = 0 , }){
 
@@ -305,7 +304,7 @@ export default function App(){
     }
             <h2>{category()}</h2>
           <div className='gameBorder'>
-
+            
           {activeIndex === 0 || activeIndex === 1 ? (
             <Category
               isActive={activeIndex === 1}

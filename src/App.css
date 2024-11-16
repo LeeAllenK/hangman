@@ -26,3 +26,7 @@
 .homeBtn{
   height: 50px;
 }
+.App{
+  display: flex;
+  flex-direction: column;
+}
