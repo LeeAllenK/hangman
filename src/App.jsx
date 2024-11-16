@@ -161,7 +161,7 @@ function Category({onShow , children ,isActive ,disabled, isShowing = 0 , }){
         case 'google':
         setShowHint(phoneHints.google)
         break;
-        default: setShowHint('')
+        default: console.log('w')
       }
     }
     
@@ -174,7 +174,7 @@ function Category({onShow , children ,isActive ,disabled, isShowing = 0 , }){
         className='hints'
         style={{fontSize: 30, fontWeight: 'bolder'}}  
       > 
-      {showHint}
+        
       </h2>
       {isActive ? (
         <div>
@@ -191,6 +191,13 @@ function Category({onShow , children ,isActive ,disabled, isShowing = 0 , }){
               </PickLetterBtn>
             )
           })}
+        <br/><br/>
+        <div 
+        className='hint'
+        style={{fontSize: 20, fontWeight: 'bolder'}}  
+        >
+        {showHint}
+        </div>
         <div 
         className='wordDisplay'
         style={{fontSize: 50, fontWeight: 'bolder'}}
@@ -241,7 +248,7 @@ function Category({onShow , children ,isActive ,disabled, isShowing = 0 , }){
           onClick={(e) => resetGame()}
         />
         <button
-        className='hint'
+        className='showHint'
         onClick={getHint}  
         >
           Hint
@@ -257,37 +264,35 @@ function Category({onShow , children ,isActive ,disabled, isShowing = 0 , }){
 
 export default function App(){
 
-  const [activeIndex, setActiveIndex] = useState(0);
+   const [activeIndex, setActiveIndex] = useState(0);
 
-  const randomCar = () => {
+    const randomCar = () => {
     let car = categories.car
     let random = Math.floor(Math.random() * car.length)
     setActiveIndex(1)
     return categories.car[random].split('');
 
-  }
+    }
 
-  const randomFood = () => {
+    const randomFood = () => {
       let food = categories.food
       let random = Math.floor(Math.random() * food.length)
       setActiveIndex(2)
       return categories.food[random].split('');  
-  }
+    }
  
     const randomTech = () => {
       let tech = categories.phones
       let random = Math.floor(Math.random() * tech.length)
       setActiveIndex(3)
       return categories.phones[random].split('');
-      
-  }
+    }
     const category = () =>{
       if(activeIndex === 1) return 'Cars';
       if(activeIndex === 2) return 'Food';
       if(activeIndex === 3) return 'Phones';
     }
     const goHome = () => {
-        console.log('click')
         setActiveIndex(0)
     }
   return (
