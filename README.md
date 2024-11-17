@@ -3,7 +3,7 @@
 
 <div id="header" >
  <h1  class="heading-element" dir="auto">Hangman<a href="https://fladev-hangman.netlify.app/">Visit Here</a></h1>
- <img src="https://i.imgur.com/lIGOUKU.gif" alt="Hangman">
+ <img src="https://i.imgur.com/knBIUci.gif" alt="Hangman">
 
 </div>
 
