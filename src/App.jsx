@@ -32,13 +32,19 @@ let randomC = Math.floor(Math.random() * categories.car.length )
 let randomF = Math.floor(Math.random() * categories.car.length )
 let randomT = Math.floor(Math.random() * categories.car.length )
 
- let Cars = categories.car[randomC].split('');
- let Food = categories.food[randomF].split('');
- let Tech = categories.phones[randomT].split('');
+let Cars = categories.car[randomC].split('');
+let Food = categories.food[randomF].split('');
+let Tech = categories.phones[randomT].split('');
 
 let alpha = 'abcdefghijklmnopqrstuvwxyz';
 
-function Category({onShow , children ,isActive ,disabled, isShowing = 0 , }){
+function Category({
+  onShow, 
+  children,
+  isActive, 
+  isShowing = 0 
+
+  }){
 
   const [cars, setCars] = useState(Cars);
   const [food, setFood] = useState(Food);
@@ -65,7 +71,6 @@ function Category({onShow , children ,isActive ,disabled, isShowing = 0 , }){
     return categories.phones[random].split('');
 
   }
-
   const handleClick = (item, i) => {
     if(!guessedLetters.includes(item)) {
       setGuessedLetters([...guessedLetters, item]);
@@ -88,34 +93,32 @@ function Category({onShow , children ,isActive ,disabled, isShowing = 0 , }){
     }
   
   }
-
   const gameLost = () => {
+  console.log(cars)
    if(error >= 7 && isShowing === 1){
       return(
-        <p>Loser the answer was {cars}</p>
+        <p style={{ fontSize: 3 + 'em', color: 'white' }}>Loser! The answer was {cars.join('').toUpperCase()}</p>
       )
     }
-   if(error >= 7 &&isShowing === 2  ){
+   if(error >= 7 && isShowing === 2  ){
       return(
-        <p>Loser the answer was {food}</p>
+        <p style={{ fontSize: 3 + 'em', color: 'white' }}>Loser! The answer was {food.join('').toUpperCase()}</p>
       )
     }
    if(error >= 7 && isShowing === 3 ){
       return(
-        <p>Loser the answer was {tech}</p>
+        <p style={{ fontSize: 3 + 'em', color: 'white' }}>Loser! The answer was {tech.join('').toUpperCase()}</p>
       )
     }
   }
-
  const resetGame = () =>{
-  if(isShowing === 1) setCars(randomCar)
-  if(isShowing === 2) setFood(randomFood)
-  if(isShowing === 3) setTech(randomTech)
+  if(isShowing === 1) setCars(randomCar);
+  if(isShowing === 2) setFood(randomFood);
+  if(isShowing === 3) setTech(randomTech);
   setGuessedLetters([]);
   setError(0);   
-  setShowHint('')
+  setShowHint('');
   }
-
   const getHint = () => { 
     let carHints = categories.carHints
     let foodHints = categories.foodHints
@@ -167,14 +170,7 @@ function Category({onShow , children ,isActive ,disabled, isShowing = 0 , }){
   }
    return(
     <div>
-     
       <>
-       <h2 
-        className='hints'
-        style={{fontSize: 30, fontWeight: 'bolder'}}  
-      > 
-        
-      </h2>
       {isActive ? (
         <div>
           {alpha.split('').map((e , i) => {
@@ -193,9 +189,9 @@ function Category({onShow , children ,isActive ,disabled, isShowing = 0 , }){
         <br/><br/>
         <div 
         className='hint'
-        style={{fontSize: 20, fontWeight: 'bolder'}}  
+        style={{fontSize: 3 + 'em', fontWeight: 'bolder', color: 'white'}}  
         >
-        {showHint}
+        {showHint.charAt(0).toUpperCase() + showHint.slice(1)}
         </div>
         <div 
         className='wordDisplay'
@@ -241,7 +237,7 @@ function Category({onShow , children ,isActive ,disabled, isShowing = 0 , }){
               </>
           }
       </div>
-        {gameWon() && <p>YOU WIN</p>}
+        {gameWon() && <p style={{fontSize: 3 + 'em', color: 'white'}}>YOU WIN</p>}
         {gameLost()}
         <ResetBtn
           onClick={(e) => resetGame()}
@@ -270,9 +266,7 @@ export default function App(){
     let random = Math.floor(Math.random() * car.length)
     setActiveIndex(1)
     return categories.car[random].split('');
-
     }
-
     const randomFood = () => {
       let food = categories.food
       let random = Math.floor(Math.random() * food.length)
@@ -298,13 +292,15 @@ export default function App(){
       <div className='App'>
     {activeIndex == 0 && 
       <p
-        className='category'
-        style={{ fontSize: 30, fontWeight: 'bolder' }}
+        className='categoryHead'
+          style={{ fontSize: 3 + 'em', fontWeight: 'bolder' , color: 'white'}}
       >Category</p>
     }
-            <h2>{category()}</h2>
-          <div className='gameBorder'>
-            
+            <h2 
+            className='categoryTitle'
+            style={{fontSize: 3 + 'em', color: 'white'}}    
+          >{category()}</h2>
+          <div className='gameBorder'>     
           {activeIndex === 0 || activeIndex === 1 ? (
             <Category
               isActive={activeIndex === 1}
@@ -316,7 +312,6 @@ export default function App(){
           ) : (
            <p></p>
             )}
-          
          {activeIndex === 0  || activeIndex === 2 ? (
             <Category
               isActive={activeIndex === 2}
@@ -328,9 +323,7 @@ export default function App(){
           ) : (
             <p></p>
           )}
-       
-
-        {activeIndex === 0 || activeIndex === 3 ? (
+         {activeIndex === 0 || activeIndex === 3 ? (
             <Category
               isActive={activeIndex === 3}
               isShowing={3}
