@@ -36,7 +36,7 @@ let Cars = categories.car[randomC].split('');
 let Food = categories.food[randomF].split('');
 let Tech = categories.phones[randomT].split('');
 
-let alpha = 'abcdefghijklmnopqrstuvwxyz';
+let alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 function Category({
   onShow, 
@@ -74,6 +74,7 @@ function Category({
   const handleClick = (item, i) => {
     if(!guessedLetters.includes(item)) {
       setGuessedLetters([...guessedLetters, item]);
+      console.log(guessedLetters)
     }
 
     if(!cars.includes(item)) {
@@ -82,32 +83,32 @@ function Category({
   }
   const gameWon = () => {
     if(isShowing === 1){
-      return cars.every(e => guessedLetters.includes(e.toLowerCase()));
+      return cars.every(e => guessedLetters.includes(e.toUpperCase()));
     }
     if(isShowing === 2){
-      return food.every(e => guessedLetters.includes(e.toLowerCase()));
+      return food.every(e => guessedLetters.includes(e.toUpperCase()));
     }
 
     if(isShowing === 3){
-      return tech.every(e => guessedLetters.includes(e.toLowerCase()));
+      return tech.every(e => guessedLetters.includes(e.toUpperCase()));
     }
   
   }
   const gameLost = () => {
-  console.log(cars)
+ 
    if(error >= 7 && isShowing === 1){
       return(
-        <p style={{ fontSize: 3 + 'em', color: 'white' }}>Loser! The answer was {cars.join('').toUpperCase()}</p>
+        <p style={{ fontSize: 2 + 'em', color: 'white' }}>Loser! The answer was {cars.join('').toUpperCase()}</p>
       )
     }
    if(error >= 7 && isShowing === 2  ){
       return(
-        <p style={{ fontSize: 3 + 'em', color: 'white' }}>Loser! The answer was {food.join('').toUpperCase()}</p>
+        <p style={{ fontSize: 2 + 'em', color: 'white' }}>Loser! The answer was {food.join('').toUpperCase()}</p>
       )
     }
    if(error >= 7 && isShowing === 3 ){
       return(
-        <p style={{ fontSize: 3 + 'em', color: 'white' }}>Loser! The answer was {tech.join('').toUpperCase()}</p>
+        <p style={{ fontSize: 2 + 'em', color: 'white' }}>Loser! The answer was {tech.join('').toUpperCase()}</p>
       )
     }
   }
@@ -166,7 +167,6 @@ function Category({
         default: console.log('w')
       }
     }
-    
   }
    return(
     <div>
@@ -189,14 +189,14 @@ function Category({
         <br/><br/>
         <div 
         className='hint'
-        style={{fontSize: 3 + 'em', fontWeight: 'bolder', color: 'white'}}  
+        style={{fontSize: 2 + 'em', fontWeight: 'bolder', color: 'white'}}  
         >
         {showHint.charAt(0).toUpperCase() + showHint.slice(1)}
         </div>
-        <div 
-        className='wordDisplay'
+        <div className='wordDisplay'
         style={{fontSize: 50, fontWeight: 'bolder'}}
       >
+        
       {isShowing === 1 && 
         <>
         {cars.map((e, i) => {
@@ -204,7 +204,7 @@ function Category({
           <span 
           key={i}
           >
-           {guessedLetters.includes(e.toLowerCase()) ? e : '_' }
+           {guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_' }
           </span>
           )
         })}
@@ -217,7 +217,7 @@ function Category({
                    <span
                      key={i}
                    >
-                     {guessedLetters.includes(e.toLowerCase()) ? e : '_'}
+                     {guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
                    </span>
                  )
                })}
@@ -230,14 +230,14 @@ function Category({
                    <span
                      key={i}
                    >
-                     {guessedLetters.includes(e.toLowerCase()) ? e : '_'}
+                     {guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
                    </span>
                  )
                })}
               </>
           }
       </div>
-        {gameWon() && <p style={{fontSize: 3 + 'em', color: 'white'}}>YOU WIN</p>}
+        {gameWon() && <p style={{fontSize: 2 + 'em', color: 'white'}}>YOU WIN!</p>}
         {gameLost()}
         <ResetBtn
           onClick={(e) => resetGame()}
