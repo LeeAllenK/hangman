@@ -1,4 +1,4 @@
-import { useState} from 'react'
+import {useState} from 'react'
 
 import {PickLetterBtn} from './components/Buttons.jsx/PickLetterBtn'
 import {ResetBtn} from './components/Buttons.jsx/ResetBtn'
@@ -74,12 +74,13 @@ function Category({
   const handleClick = (item, i) => {
     if(!guessedLetters.includes(item)) {
       setGuessedLetters([...guessedLetters, item]);
-      console.log(guessedLetters)
+     
     }
 
-    if(!cars.includes(item)) {
+    if(guessedLetters.includes(item)) {
       setError(error + 1);
     }
+    console.log(error)
   }
   const gameWon = () => {
     if(isShowing === 1){
@@ -96,23 +97,25 @@ function Category({
   }
   const gameLost = () => {
  
-   if(error >= 7 && isShowing === 1){
+   if(error === 7 && isShowing === 1){
       return(
         <p style={{ fontSize: 2 + 'em', color: 'white' }}>Loser! The answer was {cars.join('').toUpperCase()}</p>
       )
     }
-   if(error >= 7 && isShowing === 2  ){
+   if(error === 7 && isShowing === 2  ){
       return(
         <p style={{ fontSize: 2 + 'em', color: 'white' }}>Loser! The answer was {food.join('').toUpperCase()}</p>
       )
     }
-   if(error >= 7 && isShowing === 3 ){
+   if(error === 7 && isShowing === 3 ){
       return(
         <p style={{ fontSize: 2 + 'em', color: 'white' }}>Loser! The answer was {tech.join('').toUpperCase()}</p>
       )
     }
   }
+
  const resetGame = () =>{
+
   if(isShowing === 1) setCars(randomCar);
   if(isShowing === 2) setFood(randomFood);
   if(isShowing === 3) setTech(randomTech);
@@ -164,7 +167,7 @@ function Category({
         case 'google':
         setShowHint(phoneHints.google)
         break;
-        default: console.log('w')
+        default: setShowHint('')
       }
     }
   }
@@ -195,8 +198,7 @@ function Category({
         </div>
         <div className='wordDisplay'
         style={{fontSize: 50, fontWeight: 'bolder'}}
-      >
-        
+      >   
       {isShowing === 1 && 
         <>
         {cars.map((e, i) => {
@@ -256,11 +258,9 @@ function Category({
     </div>
   )
 }
-
 export default function App(){
 
    const [activeIndex, setActiveIndex] = useState(0);
-
     const randomCar = () => {
     let car = categories.car
     let random = Math.floor(Math.random() * car.length)
@@ -273,7 +273,6 @@ export default function App(){
       setActiveIndex(2)
       return categories.food[random].split('');  
     }
- 
     const randomTech = () => {
       let tech = categories.phones
       let random = Math.floor(Math.random() * tech.length)
