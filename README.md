@@ -21,6 +21,5 @@
 
 <div id="header">
  <h1 class="heading-element" dir="auto">Lessons Learned:</h1>
- A lesson learned was remembering state changes after each re-render. Since state updates utilizing conditional rendering is critical so users can see updated state.
- 
+ One key lesson learned was the importance of remembering that state changes after each re-render. This ensures that the application remains responsive and up-to-date. Utilizing conditional rendering is critical for displaying updated state to users. This ensures that the UI reflects the current state of the application.
 </div>
