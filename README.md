@@ -15,8 +15,7 @@
 
 <div id="header" >
  <h1 class="heading-element" dir="auto">Optimizations:</h1>
-  The app curently doesn't have a login for the users that will be one area of focus. I then will focus on a more mobile approach with React Native. 
-  Users currently have 3 categories to choose from more to be added with future updates. There is currently no time limit a timer will be added with updates.
+Implement a login system to allow users to create accounts and save their preferences. Also develop a mobile version of the app using React Native. This will enable users to access the app on their mobile devices. Currently, users have three categories to choose from. Plan to add more categories in future updates to offer a wider range of options. Introduce a timer feature to add a time limit for game. Finally a hangman image for every error made.
 </div>
 
 <div id="header">
