@@ -1,9 +1,11 @@
 import {useState} from 'react'
-
 import {PickLetterBtn} from './components/Buttons.jsx/PickLetterBtn'
 import {ResetBtn} from './components/Buttons.jsx/ResetBtn'
 import {HomeBtn} from './components/Buttons.jsx/HomeBtn'
+import {Clock} from './components/Clock';
+
 import './App.css'
+import './stick.css'
 
 let categories = {
     car: ["mustang" , "ford" , "dodge"],
@@ -42,8 +44,7 @@ function Category({
   onShow, 
   children,
   isActive, 
-  isShowing = 0 
-
+  isShowing = 0
   }){
 
   const [cars, setCars] = useState(Cars);
@@ -52,36 +53,38 @@ function Category({
   const [guessedLetters, setGuessedLetters] = useState([]);
   const [error, setError] = useState(0);
   const [showHint , setShowHint] = useState('');
+  const [isDisabled, setIsDisabled] = useState(false)
+  const [reset, setReset] = useState(false)
+
 
   const randomCar = () => {
     let car = categories.car;
     let random = Math.floor(Math.random() * car.length);
     return categories.car[random].split('');
-
   }
   const randomFood = () => {
     let food = categories.food;
     let random = Math.floor(Math.random() * food.length);
     return categories.food[random].split('');
-
   }
   const randomTech= () => {
     let tech = categories.phones;
     let random = Math.floor(Math.random() * tech.length);
     return categories.phones[random].split('');
-
   }
-  const handleClick = (item, i) => {
+  const handleClick = (item) => {
+    let car = categories.car;
+    let random = Math.floor(Math.random() * car.length);
     if(!guessedLetters.includes(item)) {
       setGuessedLetters([...guessedLetters, item]);
-     
-    }
 
-    if(guessedLetters.includes(item)) {
-      setError(error + 1);
+     if ((isShowing === 1 && !cars.includes(item.toLowerCase())) || (isShowing === 2 && !food.includes(item.toLowerCase())) || (isShowing === 3 && !tech.includes(item.toLowerCase()))){ 
+        setError(error + 1); 
+        updateStickMan(error + 1);  
+      }   
     }
-    console.log(error)
-  }
+  };
+
   const gameWon = () => {
     if(isShowing === 1){
       return cars.every(e => guessedLetters.includes(e.toUpperCase()));
@@ -96,32 +99,45 @@ function Category({
   
   }
   const gameLost = () => {
- 
-   if(error === 7 && isShowing === 1){
+   if(error === 6 && isShowing === 1){
       return(
         <p style={{ fontSize: 2 + 'em', color: 'white' }}>Loser! The answer was {cars.join('').toUpperCase()}</p>
       )
     }
-   if(error === 7 && isShowing === 2  ){
+   if(error === 6 && isShowing === 2  ){
       return(
         <p style={{ fontSize: 2 + 'em', color: 'white' }}>Loser! The answer was {food.join('').toUpperCase()}</p>
       )
     }
-   if(error === 7 && isShowing === 3 ){
+   if(error === 6 && isShowing === 3 ){
       return(
         <p style={{ fontSize: 2 + 'em', color: 'white' }}>Loser! The answer was {tech.join('').toUpperCase()}</p>
       )
     }
   }
 
- const resetGame = () =>{
+  const updateStickMan = (errors) => {
 
+    const parts = ['head', 'body', 'left-arm', 'right-arm', 'left-leg', 'right-leg'];
+    parts.forEach((part, index) => {
+      const element = document.querySelector(`.${part}`);
+      if(index < errors) {
+        element.style.display = 'block';
+      } else {
+        element.style.display = 'none';
+      }
+    });
+  }
+ const resetGame = () =>{
   if(isShowing === 1) setCars(randomCar);
   if(isShowing === 2) setFood(randomFood);
   if(isShowing === 3) setTech(randomTech);
   setGuessedLetters([]);
   setError(0);   
   setShowHint('');
+  updateStickMan(0);
+  setReset(true)
+  setTimeout(() => setReset(false), 0)
   }
   const getHint = () => { 
     let carHints = categories.carHints
@@ -171,20 +187,34 @@ function Category({
       }
     }
   }
+ 
    return(
     <div>
       <>
       {isActive ? (
         <div>
+      <Clock onDisable={setIsDisabled} reset={reset} />
+             <div className="hangman">
+               <div className="base"></div>
+               <div className="pole"></div>
+               <div className="beam"></div>
+               <div className="rope"></div>
+               <div className="head"></div>
+               <div className="body"></div>
+               <div className="left-arm"></div>
+               <div className="right-arm"></div>
+               <div className="left-leg"></div>
+               <div className="right-leg"></div>
+             </div>
           {alpha.split('').map((e , i) => {
             return(
               <PickLetterBtn
                 key={i}  
                 value={e}
-                onClick={
-                () => handleClick(e ,i)
+                onClick={() => 
+                  handleClick(e)
                 }
-                disabled={gameWon() || gameLost()}
+                disabled={gameWon() || gameLost() || isDisabled}
               >
               </PickLetterBtn>
             )
@@ -204,6 +234,7 @@ function Category({
         {cars.map((e, i) => {
           return(
           <span 
+            style={{ color: guessedLetters.includes(e.toUpperCase()) ? 'white' : 'black' }}
           key={i}
           >
            {guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_' }
@@ -259,8 +290,8 @@ function Category({
   )
 }
 export default function App(){
-
    const [activeIndex, setActiveIndex] = useState(0);
+
     const randomCar = () => {
     let car = categories.car
     let random = Math.floor(Math.random() * car.length)
