@@ -1,7 +1,7 @@
 
 <div id="header" >
  <h1  class="heading-element" dir="auto">Hangman<a href="https://fladev-hangman.netlify.app/">Visit Here</a></h1>
- <img src="https://i.imgur.com/knBIUci.gif" alt="Hangman">
+ <img src="https://i.imgur.com/Tlv5kZ9.gif" alt="Hangman">
  A friendly game of Hangman!
 </div>
 
