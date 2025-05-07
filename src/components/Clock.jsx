@@ -1,7 +1,7 @@
 import {useState , useEffect} from 'react';
 
 
-export const Clock = ({ onDisable , reset })=>{
+export const Clock = ({ onDisable, reset, stop })=>{
 	const [minutes , setMinutes] = useState(0);
 	const [seconds , setSeconds] = useState(0);
 
@@ -13,15 +13,18 @@ export const Clock = ({ onDisable , reset })=>{
 				setMinutes(+1);
 			}
 		} ,1000)
-			if(minutes === 1&& seconds === 0 ){
+			if(minutes === 1 && seconds === 0 ){
 				onDisable(true);
 			 clearInterval(timer);
-			
 			}
+
+			if(stop) {
+			clearInterval(timer)
+			};
 		return () =>{
 			clearInterval(timer);
 		};
-	} , [seconds, minutes, onDisable])
+	} , [seconds, minutes, onDisable, stop])
 	useEffect(() => {
 		if(reset) {
 			setMinutes(0);
@@ -31,7 +34,7 @@ export const Clock = ({ onDisable , reset })=>{
 		}, [reset, onDisable]);
 	return(
 		<>
-		<div className='timer' style={{color: 'white'}}>{`${minutes}: ${seconds < 10 ? '0' + seconds : seconds}`}</div>
+		<div className='text-white text-3xl ' >{`${minutes}: ${seconds < 10 ? '0' + seconds : seconds}`}</div>
 			{minutes === 1 && <p style={{color: 'white' , fontSize: 1.5 + 'em' , fontWeight: 'bolder'}}>Time's Up Loser</p>}
 		</>
 	)
