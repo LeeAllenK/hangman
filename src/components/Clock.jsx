@@ -34,8 +34,10 @@ export const Clock = ({ onDisable, reset, stop })=>{
 		}, [reset, onDisable]);
 	return(
 		<>
-		<div className='text-white text-3xl ' >{`${minutes}: ${seconds < 10 ? '0' + seconds : seconds}`}</div>
-			{minutes === 1 && <p style={{color: 'white' , fontSize: 1.5 + 'em' , fontWeight: 'bolder'}}>Time's Up Loser</p>}
+			<div className='grid grid-cols-2 place-items-center border-2 text-white text-4xl font-extrabold w-full h-20 ' >{`${minutes}: ${seconds < 10 ? '0' + seconds : seconds}`}
+			{seconds > 1 && <p>Time's Up Loser</p>}
+
+			</div>
 		</>
 	)
 }

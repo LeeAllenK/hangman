@@ -13,11 +13,17 @@ const categories = {
   phoneHints: { apple: 'not an orange', android: '18', google: 'browse' }
 };
 
+const hintsArray = [
+  { id: 1, hints: categories.carHints },
+  { id: 2, hints: categories.foodHints },
+  { id: 3, hints: categories.phoneHints }
+];
+
 const getRandomItem = (category) => {
   return categories[category][Math.floor(Math.random() * categories[category].length)].split('');
 };
 
-function Category({ onShow, children, isActive, isShowing = 0 }) {
+function Category({ isActive, isShowing = 0 }) {
   const [word, setWord] = useState(() => getRandomItem(Object.keys(categories)[isShowing - 1]));
   const [guessedLetters, setGuessedLetters] = useState([]);
   const [error, setError] = useState(0);
@@ -36,24 +42,20 @@ function Category({ onShow, children, isActive, isShowing = 0 }) {
       }
     }
   };
-
   const gameWon = () => word.every((e) => guessedLetters.includes(e.toUpperCase()));
-
-  const gameLost = () => {
-    if(error === 6) {
-      return <p style={{ fontSize: '2em', color: 'white' }}>Loser! The answer was {word.join('').toUpperCase()}</p>;
-    }
-    return null;
-  };
+  const gameLost = () => (error === 6 ? <p>Loser! The answer was {word.join('').toUpperCase()}</p> : null);
 
   const updateStickMan = (errors) => {
     const parts = ['head', 'body', 'left-arm', 'right-arm', 'left-leg', 'right-leg'];
     parts.forEach((part, index) => {
       const element = document.querySelector(`.${part}`);
-      element.style.display = index < errors ? 'block' : 'none';
+      if(element) {
+        element.classList.toggle('hidden', index >= errors);
+      } else {
+        console.warn(`Element for ${part} not found`);
+      }
     });
   };
-
   const resetGame = () => {
     setWord(getRandomItem(Object.keys(categories)[isShowing - 1]));
     setGuessedLetters([]);
@@ -66,49 +68,40 @@ function Category({ onShow, children, isActive, isShowing = 0 }) {
   };
 
   const getHint = () => {
-    const hints = { 1: categories.carHints, 2: categories.foodHints, 3: categories.phoneHints };
-    setShowHint(hints[isShowing]?.[word.join('')] || '');
+    const hintCategory = hintsArray.find(item => item.id === isShowing);
+    setShowHint(hintCategory?.hints?.[word.join('')] || '');
   };
-
   return (
     <div>
-      {isActive ? (
-        <div className=' w-screen h-screen place-items-center place-content-center'>
-          <Clock onDisable={setIsDisabled} reset={reset} stop={stop} />
-          <div className="hangman">
-            <div className="base"></div>
-            <div className="pole"></div>
-            <div className="beam"></div>
-            <div className="rope"></div>
-            <div className="head"></div>
-            <div className="body"></div>
-            <div className="left-arm"></div>
-            <div className="right-arm"></div>
-            <div className="left-leg"></div>
-            <div className="right-leg"></div>
-          </div>
-          <section className='grid grid-cols-16 items-center place-content-center h-screen w-full '>
-          {alpha.split('').map((e, i) => (
-            <PickLetterBtn  key={i} value={e} onClick={() => handleClick(e)} disabled={gameWon() || gameLost() || isDisabled} />
-          ))}
+      {isActive && (
+        <div className="grid grid-cols-1 w-screen h-screen place-items-center">
+          <section className="grid w-full h-fit">
+            <Clock onDisable={setIsDisabled} reset={reset} stop={stop} />
           </section>
-          <div className="text-6xl" style={{ fontWeight: 'bolder', color: 'white' }}>
-            {showHint.charAt(0).toUpperCase() + showHint.slice(1)}
-          </div>
-          <div className="wordDisplay" style={{ fontSize: 50, fontWeight: 'bolder' }}>
-            {word.map((e, i) => (
-              <span key={i} style={{ color: guessedLetters.includes(e.toUpperCase()) ? 'white' : 'black' }}>
-                {guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
-              </span>
+          <section className="flex flex-wrap justify-center w-[50%]">
+            {alpha.split('').map((e, i) => (
+              <PickLetterBtn key={i} value={e} onClick={() => handleClick(e)} disabled={gameWon() || gameLost() || isDisabled} />
             ))}
+          </section>
+          <div className="grid grid-cols-2 justify-center border-3 w-full h-full text-center text-4xl">
+            <div className="flex flex-row justify-center items-center">
+              {showHint && <p>{showHint.charAt(0).toUpperCase() + showHint.slice(1)}</p>}
+              {word.map((e, i) => (
+                <span key={i} style={{ color: guessedLetters.includes(e.toUpperCase()) ? 'white' : 'black' }}>
+                  {guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
+                </span>
+              ))}
+            </div>
+            <section className="flex flex-col justify-center gap-4">
+              <ResetBtn onClick={resetGame} />
+              <button className="showHint" onClick={getHint}>
+                Hint
+              </button>
+            </section>
           </div>
-          {gameWon() && <p style={{ fontSize: '2em', color: 'white' }}>YOU WIN!</p>}
+          {gameWon() && <p className="text-6xl text-green-500">YOU WIN!</p>}
           {gameLost()}
-          <ResetBtn onClick={resetGame} />
-          <button className="showHint" onClick={getHint}>Hint</button>
         </div>
-      ) : (
-        <></>
       )}
     </div>
   );
@@ -121,22 +114,16 @@ export default function App() {
     { id: 2, name: 'Food', type: 'food' },
     { id: 3, name: 'Phones', type: 'phones' }
   ];
-
-  const categoryName = () => categoriesList.find(c => c.id === activeIndex)?.name || 'Category';
-
   return (
-     <div className=" w-screen h-screen">
-      {activeIndex === 0 && 
+    <div className="grid place-items-center w-screen h-screen p-4">
+      {activeIndex === 0 && (
         <>
-         <h1 className='grid justify-center items-center w-full h-full'>
-           {activeIndex === 0 && <p className="text-black text-7xl font-extrabold text-center">{categoryName()}</p>} 
-         </h1>
-          <section className='grid place-items-center place-content-start grid-cols-3 w-[98%] h-full gap-1'>
-          {activeIndex === 0 &&
-            categoriesList.map(({ id, name }) => (
+          <h1 className="text-black text-7xl font-extrabold text-center">{categoriesList.find(c => c.id === activeIndex)?.name || 'Category'}</h1>
+          <section className="grid grid-cols-3 gap-2 w-full">
+            {categoriesList.map(({ id, name }) => (
               <button
                 key={id}
-                className="w-full font-bold text-4xl border-3 border-b-7 border-r-7 w-50 h-15 rounded-lg bg-blue-600 text-black border-black hover:transition hover:duration-350 hover:ease-in-out hover:text-white active:translate-y-0.5 cursor-pointer"
+                className="font-bold text-4xl border-3 w-full py-4 rounded-lg bg-blue-600 text-black border-black hover:text-white active:translate-y-0.5"
                 onClick={() => setActiveIndex(id)}
               >
                 {name}
@@ -144,17 +131,13 @@ export default function App() {
             ))}
           </section>
         </>
-      }
-    {activeIndex > 0 && 
-      <div className=" justify-center w-full h-full place-items-center">
-        {activeIndex > 0 && 
-        <>
-        <HomeBtn onHomeClick={() => setActiveIndex(0)} value="Home"/>
-        <Category isActive={true} isShowing={activeIndex} />
-        </>
-        }
-      </div>
-    }
+      )}
+      {activeIndex > 0 && (
+        <div className="grid place-items-center w-full h-full">
+          <HomeBtn onHomeClick={() => setActiveIndex(0)} value="Home" />
+          <Category isActive={true} isShowing={activeIndex} />
+        </div>
+      )}
     </div>
   );
 }
