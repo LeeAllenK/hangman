@@ -1,376 +1,149 @@
-import {useState} from 'react'
-import {PickLetterBtn} from './components/Buttons.jsx/PickLetterBtn'
-import {ResetBtn} from './components/Buttons.jsx/ResetBtn'
-import {HomeBtn} from './components/Buttons.jsx/HomeBtn'
-import {Clock} from './components/Clock';
+import { useState,useReducer } from 'react';
+import { PickLetterBtn } from './components/PickLetterBtn';
+import { ResetBtn } from './components/ResetBtn';
+import { HomeBtn } from './components/HomeBtn';
+import { Clock } from './components/Clock';
+import { Stickman } from './components/Stickman';
+import {AppReducer} from './AppReducer'
 
-import './App.css'
-import './stick.css'
+const categories = {
+  car: ['mustang', 'ford', 'dodge'],
+  food: ['pizza', 'wings', 'fries'],
+  phones: ['apple', 'android', 'google']
+};
+const hints = {
+  mustang: 'ponies',
+  ford: 'car inventor',
+  dodge: 'evade',
+  pizza: 'stuffed crusted',
+  wings: 'hot or mild',
+  fries: 'potato slices',
+  apple: 'not an orange',
+  android: '18',
+  google: 'browse'
+};
 
-let categories = {
-    car: ["mustang" , "ford" , "dodge"],
-    food: ["pizza" , "wings", "fries"],
-    phones: ["apple" , "android" , "google"],
-    carHints: {
-      mustang:"ponies",
-      ford:"car inventor",
-      dodge:"evade",
-    },
-    foodHints: {
-      pizza: 'stuffed crusted',
-      wings: 'hot or mild',
-      fries: 'potatoe slices'
-    },
-    phoneHints: {
-      apple: 'not an orange',
-      android: '18',
-      google: 'browse'
-    }
- }
+const getRandomItem = (category) => {
+  return categories[category][Math.floor(Math.random() * categories[category].length)];
+};
+const initialState = {
+  guessedLetters:[],
+  error: 0,
+  showHint: '',
+  reset: false,
+  activeCategory:null,
+}
+// Main Game Component
+function Category({ isActive, category, onHomeClick }) {
+  const [word, setWord] = useState(getRandomItem(category));
+  const [guessedLetters, setGuessedLetters] = useState(initialState);
+  const [error, setError] = useState(initialState);
+  const [showHint, setShowHint] = useState(initialState);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [reset, setReset] = useState(initialState);
+  const [stop, setStop] = useState(false);
+  const [state, dispatch] = useReducer(AppReducer,initialState)
+  const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-let c = categories.car
-
-let randomC = Math.floor(Math.random() * categories.car.length )
-let randomF = Math.floor(Math.random() * categories.car.length )
-let randomT = Math.floor(Math.random() * categories.car.length )
-
-let Cars = categories.car[randomC].split('');
-let Food = categories.food[randomF].split('');
-let Tech = categories.phones[randomT].split('');
-
-let alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-function Category({
-  onShow, 
-  children,
-  isActive, 
-  isShowing = 0
-  }){
-
-  const [cars, setCars] = useState(Cars);
-  const [food, setFood] = useState(Food);
-  const [tech, setTech] = useState(Tech);
-  const [guessedLetters, setGuessedLetters] = useState([]);
-  const [error, setError] = useState(0);
-  const [showHint , setShowHint] = useState('');
-  const [isDisabled, setIsDisabled] = useState(false)
-  const [reset, setReset] = useState(false)
-
-
-  const randomCar = () => {
-    let car = categories.car;
-    let random = Math.floor(Math.random() * car.length);
-    return categories.car[random].split('');
-  }
-  const randomFood = () => {
-    let food = categories.food;
-    let random = Math.floor(Math.random() * food.length);
-    return categories.food[random].split('');
-  }
-  const randomTech= () => {
-    let tech = categories.phones;
-    let random = Math.floor(Math.random() * tech.length);
-    return categories.phones[random].split('');
-  }
-  const handleClick = (item) => {
-    let car = categories.car;
-    let random = Math.floor(Math.random() * car.length);
-    if(!guessedLetters.includes(item)) {
-      setGuessedLetters([...guessedLetters, item]);
-
-     if ((isShowing === 1 && !cars.includes(item.toLowerCase())) || (isShowing === 2 && !food.includes(item.toLowerCase())) || (isShowing === 3 && !tech.includes(item.toLowerCase()))){ 
-        setError(error + 1); 
-        updateStickMan(error + 1);  
-      }   
+  const handleClick = (letter) => {
+    if(!state.guessedLetters.includes(letter)) {
+      dispatch({type: 'setGuessedLetters', guessedLetters: [...state.guessedLetters,letter]})
+      if(!word.includes(letter.toLowerCase())) {
+        dispatch({type:'setError', error: state.error + 1})
+      }
     }
   };
-
+  const resetGame = () => {
+    dispatch({
+      type: 'reset',
+      guessedLetters: state.guessedLetters,
+      showHint: state.showHint,
+      setError: state.error,
+      reset: setTimeout(() => !state.reset,0)
+    })
+    if(state.reset){
+      setWord(getRandomItem(category))
+     }
+  };
+  const getHint = () => {
+    dispatch({ type: 'getHint', showHint: hints[word] || '' })
+  };
   const gameWon = () => {
-    if(isShowing === 1){
-      return cars.every(e => guessedLetters.includes(e.toUpperCase()));
-    }
-    if(isShowing === 2){
-      return food.every(e => guessedLetters.includes(e.toUpperCase()));
-    }
-
-    if(isShowing === 3){
-      return tech.every(e => guessedLetters.includes(e.toUpperCase()));
-    }
-  
-  }
+    return word.split('').every((letter) => state.guessedLetters.includes(letter.toUpperCase()));
+  };
   const gameLost = () => {
-   if(error === 6 && isShowing === 1){
-      return(
-        <p style={{ fontSize: 2 + 'em', color: 'white' }}>Loser! The answer was {cars.join('').toUpperCase()}</p>
-      )
-    }
-   if(error === 6 && isShowing === 2  ){
-      return(
-        <p style={{ fontSize: 2 + 'em', color: 'white' }}>Loser! The answer was {food.join('').toUpperCase()}</p>
-      )
-    }
-   if(error === 6 && isShowing === 3 ){
-      return(
-        <p style={{ fontSize: 2 + 'em', color: 'white' }}>Loser! The answer was {tech.join('').toUpperCase()}</p>
-      )
-    }
-  }
-
-  const updateStickMan = (errors) => {
-
-    const parts = ['head', 'body', 'left-arm', 'right-arm', 'left-leg', 'right-leg'];
-    parts.forEach((part, index) => {
-      const element = document.querySelector(`.${part}`);
-      if(index < errors) {
-        element.style.display = 'block';
-      } else {
-        element.style.display = 'none';
-      }
-    });
-  }
- const resetGame = () =>{
-  if(isShowing === 1) setCars(randomCar);
-  if(isShowing === 2) setFood(randomFood);
-  if(isShowing === 3) setTech(randomTech);
-  setGuessedLetters([]);
-  setError(0);   
-  setShowHint('');
-  updateStickMan(0);
-  setReset(true)
-  setTimeout(() => setReset(false), 0)
-  }
-  const getHint = () => { 
-    let carHints = categories.carHints
-    let foodHints = categories.foodHints
-    let phoneHints = categories.phoneHints
-  
-    if(isShowing === 1){
-      switch(cars.join('')){
-        case 'mustang':
-        setShowHint(carHints.mustang)
-        break;
-        case 'ford':
-        setShowHint(carHints.ford)
-        break;
-        case 'dodge':
-        setShowHint(carHints.dodge)
-        break;
-        default: setShowHint('')
-      }
-    }
-    if(isShowing === 2){
-      switch(food.join('')){
-        case 'pizza':
-        setShowHint(foodHints.pizza)
-        break;
-        case 'wings':
-        setShowHint(foodHints.wings)
-        break;
-        case 'fries':
-        setShowHint(foodHints.fries)
-        break;
-        default: setShowHint('')
-      }
-    }
-    if(isShowing === 3){
-      switch(tech.join('')){
-        case 'apple':
-        setShowHint(phoneHints.apple)
-        break;
-        case 'android':
-        setShowHint(phoneHints.android)
-        break;
-        case 'google':
-        setShowHint(phoneHints.google)
-        break;
-        default: setShowHint('')
-      }
-    }
-  }
- 
-   return(
-    <div>
-      <>
-      {isActive ? (
-        <div>
-      <Clock onDisable={setIsDisabled} reset={reset} />
-             <div className="hangman">
-               <div className="base"></div>
-               <div className="pole"></div>
-               <div className="beam"></div>
-               <div className="rope"></div>
-               <div className="head"></div>
-               <div className="body"></div>
-               <div className="left-arm"></div>
-               <div className="right-arm"></div>
-               <div className="left-leg"></div>
-               <div className="right-leg"></div>
-             </div>
-          {alpha.split('').map((e , i) => {
-            return(
-              <PickLetterBtn
-                key={i}  
-                value={e}
-                onClick={() => 
-                  handleClick(e)
-                }
-                disabled={gameWon() || gameLost() || isDisabled}
-              >
-              </PickLetterBtn>
-            )
-          })}
-        <br/><br/>
-        <div 
-        className='hint'
-        style={{fontSize: 2 + 'em', fontWeight: 'bolder', color: 'white'}}  
-        >
-        {showHint.charAt(0).toUpperCase() + showHint.slice(1)}
-        </div>
-        <div className='wordDisplay'
-        style={{fontSize: 50, fontWeight: 'bolder'}}
-      >   
-      {isShowing === 1 && 
-        <>
-        {cars.map((e, i) => {
-          return(
-          <span 
-            style={{ color: guessedLetters.includes(e.toUpperCase()) ? 'white' : 'black' }}
-          key={i}
-          >
-           {guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_' }
-          </span>
-          )
-        })}
-        </>
-      }
-          {isShowing === 2 && 
-              <>
-               {food.map((e, i) => {
-                 return (
-                   <span
-                     key={i}
-                   >
-                     {guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
-                   </span>
-                 )
-               })}
-              </>
-          }
-          {isShowing === 3 && 
-              <>
-               {tech.map((e, i) => {
-                 return (
-                   <span
-                     key={i}
-                   >
-                     {guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
-                   </span>
-                 )
-               })}
-              </>
-          }
-      </div>
-        {gameWon() && <p style={{fontSize: 2 + 'em', color: 'white'}}>YOU WIN!</p>}
-        {gameLost()}
-        <ResetBtn
-          onClick={(e) => resetGame()}
-        />
-        <button
-        className='showHint'
-        onClick={getHint}  
-        >
-          Hint
-        </button>
-        </div>
-      ) : (
-        <button onClick={onShow}>{children}</button>
-        ) }
-      </>
-    </div>
-  )
-}
-export default function App(){
-   const [activeIndex, setActiveIndex] = useState(0);
-
-    const randomCar = () => {
-    let car = categories.car
-    let random = Math.floor(Math.random() * car.length)
-    setActiveIndex(1)
-    return categories.car[random].split('');
-    }
-    const randomFood = () => {
-      let food = categories.food
-      let random = Math.floor(Math.random() * food.length)
-      setActiveIndex(2)
-      return categories.food[random].split('');  
-    }
-    const randomTech = () => {
-      let tech = categories.phones
-      let random = Math.floor(Math.random() * tech.length)
-      setActiveIndex(3)
-      return categories.phones[random].split('');
-    }
-    const category = () =>{
-      if(activeIndex === 1) return 'Cars';
-      if(activeIndex === 2) return 'Food';
-      if(activeIndex === 3) return 'Phones';
-    }
-    const goHome = () => {
-        setActiveIndex(0)
-    }
+    return state.error >= 6;
+  };
   return (
-      <div className='App'>
-    {activeIndex == 0 && 
-      <p
-        className='categoryHead'
-          style={{ fontSize: 3 + 'em', fontWeight: 'bolder' , color: 'white'}}
-      >Category</p>
-    }
-            <h2 
-            className='categoryTitle'
-            style={{fontSize: 3 + 'em', color: 'white'}}    
-          >{category()}</h2>
-          <div className='gameBorder'>     
-          {activeIndex === 0 || activeIndex === 1 ? (
-            <Category
-              isActive={activeIndex === 1}
-              isShowing={1}
-              onShow={() => randomCar()}  
-            >
-              Cars
-            </Category>
-          ) : (
-           <p></p>
-            )}
-         {activeIndex === 0  || activeIndex === 2 ? (
-            <Category
-              isActive={activeIndex === 2}
-              isShowing={2}
-              onShow={() => randomFood()}
-            >
-              Food
-            </Category>
-          ) : (
-            <p></p>
-          )}
-         {activeIndex === 0 || activeIndex === 3 ? (
-            <Category
-              isActive={activeIndex === 3}
-              isShowing={3}
-              onShow={() => randomTech()}  
-            >
-              Phones
-           </Category>
-        ) : (
-           <p></p>
-        )}
-      {activeIndex > 0 && 
-        <HomeBtn
-          onHomeClick={() => goHome()}
-          value='Home'
-        />
-      }
-          </div>     
-      </div>
-    );
+    <div>
+      {isActive && (
+        <div className="grid grid-cols-1 w-screen h-screen place-items-center font-extrabold">
+          <Stickman errors={state.error} />
+          <section className="grid grid-cols-3 lg:w-full sm:w-[98%] w-full place-items-center items-center text-5xl lg:mb-5 md:mb-2 sm:mb-3 mb-3 gap-1">
+            <Clock setIsDisabled={setIsDisabled} reset={state.reset} setReset={setReset} stop={stop} setStop={setStop} gameWon={gameWon} gameLost={gameLost}  />
+            <h2 className='flex justify-center w-full h-full gap-1' >
+              {word.split('').map((e, i) => (
+                <span className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl ' key={i} style={{ color: state.guessedLetters.includes(e.toUpperCase()) ? 'white' : 'black' }}>
+                  {state.guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
+                </span>
+              ))}
+            </h2>
+            <h3 className='lg:text-5xl md:text-5xl sm:text-4xl text-5xl '>
+              {gameWon() && <p className="text-green-500 animate-bounce">You Win!</p> }
+              {gameLost() && <p className="text-red-500 animate-bounce">You Lose!</p>}
+              {stop && <p className='text-white animate-bounce'>Times Up!</p>}
+             </h3>
+          </section>
+          <section className="grid w-full h-fit place-items-center  ">
+            <h2 className="grid grid-cols-4 justify-around place-items-center text-7xl font-extrabold lg:w-full sm:w-full w-full sm:gap-1 gap-1 h-fit">
+              <HomeBtn onHomeClick={onHomeClick} value="Home" />
+              <ResetBtn onClick={resetGame} />
+              {state.showHint.length > 0 ? <p className='opacity-100 lg:text-4xl md:text-5xl sm:text-4xl text-3xl text-white'>{state.showHint.charAt(0).toUpperCase() + state.showHint.slice(1)}</p> : <p className=' lg:text-4xl md:text-5xl sm:text-4xl text-3xl opacity-0'>Stuffed crusted</p>} 
+              <button className="flex justify-center items-center text-3xl text-white border-black font-extrabold border-2 border-r-6 border-b-7 cursor-pointer lg:w-50 md:w-50 sm:w-full lg:h-10 md:h-full sm:h-full h-full w-full rounded-2xl  hover:bg-white hover:text-black active:translate-y-0.5 " onClick={getHint} disabled={gameWon() || gameLost() || stop}>Hint</button>
+            </h2>
+          </section>
+          <section className="flex flex-wrap place-content-start lg:w-[80%] md:w-full sm:w-full w-full lg:h-full md:h-full sm:h-full h-full rounded-xl justify-center items-center ">
+            {alpha.split('').map((e, i) => (
+              <PickLetterBtn className='text-7xl text-white bg-black border-b-6 border-r-6  font-extrabold border-2 lg:w-30 md:w-30 sm:w-30 lg:h-30 md:h-30 sm:h-30 w-25 h-25  rounded-xl cursor-pointer active:translate-y-0.5 m-0.5' key={i} value={e} onClick={() => handleClick(e)} disabled={isDisabled|| gameWon() || gameLost()} />
+            ))}
+          </section>
+        </div>
+      )}
+    </div>
+  );
+}
+export default function App() {
+  const [state, dispatch] = useReducer(AppReducer,initialState)
+  const categoriesList = [
+    { name: 'Cars', type: 'car' },
+    { name: 'Food', type: 'food' },
+    { name: 'Phones', type: 'phones' }
+  ];
+  return (
+    <div className="grid grid-rows-2 place-items-center w-screen h-screen">
+      {!state.activeCategory ? (
+        <>
+          <section className='grid grid-rows-2  h-full'>
+            <h1 className="grid justify-center items-center text-blue-300 text-7xl font-extrabold  w-full h-full">Hangman</h1>
+            <h2 className="grid justify-center items-center text-blue-300 text-5xl  font-bold w-full h-full">Categories</h2>
+          </section>
+          <section className="grid grid-cols-3 gap-2 h-full w-[98%]">
+            {categoriesList.map(({ name, type }) => (
+              <button
+                key={type}
+                className="font-extrabold text-4xl border-3 w-full h-fit py-4 rounded-lg bg-blue-300 text-black border-black cursor-pointer hover:text-white active:translate-y-0.5"
+                onClick={() => dispatch({ type: 'setCategory', activeCategory: type })}
+              >
+                {name}
+              </button>
+            ))}
+          </section>
+        </>
+      ) : (
+        <div className="grid place-items-center w-full max-h-full h-auto">
+            <Category isActive={true} category={state.activeCategory} onHomeClick={() => dispatch({ type:'home', activeCategory: state.activeCategory })} />
+        </div>
+      )}
+    </div>
+  );
 }
