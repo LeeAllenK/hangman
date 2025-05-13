@@ -20,7 +20,7 @@ export const Clock = ({ setIsDisabled, reset, setStop, stop, gameWon, gameLost }
 				return s + 1;
 			});
 		}, 1000);
-		if(minutes === 1 && seconds === 0) {
+		if(minutes === 99 && seconds === 59) {
 			setIsDisabled(true);
 			setStop(true);
 			clearInterval(timerRef.current);
