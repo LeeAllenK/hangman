@@ -1,141 +1,147 @@
-import { useState } from 'react';
+import { useState,useReducer } from 'react';
 import { PickLetterBtn } from './components/PickLetterBtn';
 import { ResetBtn } from './components/ResetBtn';
 import { HomeBtn } from './components/HomeBtn';
 import { Clock } from './components/Clock';
+import { Stickman } from './components/Stickman';
+import {AppReducer} from './AppReducer'
 
 const categories = {
   car: ['mustang', 'ford', 'dodge'],
   food: ['pizza', 'wings', 'fries'],
-  phones: ['apple', 'android', 'google'],
-  carHints: { mustang: 'ponies', ford: 'car inventor', dodge: 'evade' },
-  foodHints: { pizza: 'stuffed crusted', wings: 'hot or mild', fries: 'potato slices' },
-  phoneHints: { apple: 'not an orange', android: '18', google: 'browse' }
+  phones: ['apple', 'android', 'google']
 };
-
-const hintsArray = [
-  { id: 1, hints: categories.carHints },
-  { id: 2, hints: categories.foodHints },
-  { id: 3, hints: categories.phoneHints }
-];
+const hints = {
+  mustang: 'ponies',
+  ford: 'car inventor',
+  dodge: 'evade',
+  pizza: 'stuffed crusted',
+  wings: 'hot or mild',
+  fries: 'potato slices',
+  apple: 'not an orange',
+  android: '18',
+  google: 'browse'
+};
 
 const getRandomItem = (category) => {
-  return categories[category][Math.floor(Math.random() * categories[category].length)].split('');
+  return categories[category][Math.floor(Math.random() * categories[category].length)];
 };
-
-function Category({ isActive, isShowing = 0 }) {
-  const [word, setWord] = useState(() => getRandomItem(Object.keys(categories)[isShowing - 1]));
-  const [guessedLetters, setGuessedLetters] = useState([]);
-  const [error, setError] = useState(0);
-  const [showHint, setShowHint] = useState('');
+const initialState = {
+  guessedLetters:[],
+  error: 0,
+  showHint: '',
+  reset: false,
+  activeCategory:null,
+}
+// Main Game Component
+function Category({ isActive, category, onHomeClick }) {
+  const [word, setWord] = useState(getRandomItem(category));
+  const [guessedLetters, setGuessedLetters] = useState(initialState);
+  const [error, setError] = useState(initialState);
+  const [showHint, setShowHint] = useState(initialState);
   const [isDisabled, setIsDisabled] = useState(false);
-  const [reset, setReset] = useState(false);
+  const [reset, setReset] = useState(initialState);
   const [stop, setStop] = useState(false);
+  const [state, dispatch] = useReducer(AppReducer,initialState)
   const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
   const handleClick = (letter) => {
-    if(!guessedLetters.includes(letter)) {
-      setGuessedLetters([...guessedLetters, letter]);
+    if(!state.guessedLetters.includes(letter)) {
+      dispatch({type: 'setGuessedLetters', guessedLetters: [...state.guessedLetters,letter]})
       if(!word.includes(letter.toLowerCase())) {
-        setError(error + 1);
-        updateStickMan(error + 1);
+        dispatch({type:'setError', error: state.error + 1})
       }
     }
   };
-  const gameWon = () => word.every((e) => guessedLetters.includes(e.toUpperCase()));
-  const gameLost = () => (error === 6 ? <p>Loser! The answer was {word.join('').toUpperCase()}</p> : null);
-
-  const updateStickMan = (errors) => {
-    const parts = ['head', 'body', 'left-arm', 'right-arm', 'left-leg', 'right-leg'];
-    parts.forEach((part, index) => {
-      const element = document.querySelector(`.${part}`);
-      if(element) {
-        element.classList.toggle('hidden', index >= errors);
-      } else {
-        console.warn(`Element for ${part} not found`);
-      }
-    });
-  };
   const resetGame = () => {
-    setWord(getRandomItem(Object.keys(categories)[isShowing - 1]));
-    setGuessedLetters([]);
-    setError(0);
-    setShowHint('');
-    updateStickMan(0);
-    setReset(true);
-    setTimeout(() => setReset(false), 0);
-    setStop(false);
+    dispatch({
+      type: 'reset',
+      guessedLetters: state.guessedLetters,
+      showHint: state.showHint,
+      setError: state.error,
+      reset: setTimeout(() => !state.reset,0)
+    })
+    if(state.reset){
+      setWord(getRandomItem(category))
+     }
   };
-
   const getHint = () => {
-    const hintCategory = hintsArray.find(item => item.id === isShowing);
-    setShowHint(hintCategory?.hints?.[word.join('')] || '');
+    dispatch({ type: 'getHint', showHint: hints[word] || '' })
+  };
+  const gameWon = () => {
+    return word.split('').every((letter) => state.guessedLetters.includes(letter.toUpperCase()));
+  };
+  const gameLost = () => {
+    return state.error >= 6;
   };
   return (
     <div>
       {isActive && (
-        <div className="grid grid-cols-1 w-screen h-screen place-items-center">
-          <section className="grid w-full h-fit">
-            <Clock onDisable={setIsDisabled} reset={reset} stop={stop} />
-          </section>
-          <section className="flex flex-wrap justify-center w-[50%]">
-            {alpha.split('').map((e, i) => (
-              <PickLetterBtn key={i} value={e} onClick={() => handleClick(e)} disabled={gameWon() || gameLost() || isDisabled} />
-            ))}
-          </section>
-          <div className="grid grid-cols-2 justify-center border-3 w-full h-full text-center text-4xl">
-            <div className="flex flex-row justify-center items-center">
-              {showHint && <p>{showHint.charAt(0).toUpperCase() + showHint.slice(1)}</p>}
-              {word.map((e, i) => (
-                <span key={i} style={{ color: guessedLetters.includes(e.toUpperCase()) ? 'white' : 'black' }}>
-                  {guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
+        <div className="grid grid-cols-1 w-screen h-screen place-items-center font-extrabold">
+          <Stickman errors={state.error} />
+          <section className="grid grid-cols-3 lg:w-full sm:w-[98%] w-full place-items-center items-center text-5xl lg:mb-5 md:mb-2 sm:mb-3 mb-3 gap-1">
+            <Clock setIsDisabled={setIsDisabled} reset={state.reset} setReset={setReset} stop={stop} setStop={setStop} gameWon={gameWon} gameLost={gameLost}  />
+            <h2 className='flex justify-center w-full h-full gap-1' >
+              {word.split('').map((e, i) => (
+                <span className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl ' key={i} style={{ color: state.guessedLetters.includes(e.toUpperCase()) ? 'white' : 'black' }}>
+                  {state.guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
                 </span>
               ))}
-            </div>
-            <section className="flex flex-col justify-center gap-4">
+            </h2>
+            <h3 className='lg:text-5xl md:text-5xl sm:text-4xl text-5xl '>
+              {gameWon() && <p className="text-green-500 animate-bounce">You Win!</p> }
+              {gameLost() && <p className="text-red-500 animate-bounce">You Lose!</p>}
+              {stop && <p className='text-white animate-bounce'>Times Up!</p>}
+             </h3>
+          </section>
+          <section className="grid w-full h-fit place-items-center  ">
+            <h2 className="grid grid-cols-4 justify-around place-items-center text-7xl font-extrabold lg:w-full sm:w-full w-full sm:gap-1 gap-1 h-fit">
+              <HomeBtn onHomeClick={onHomeClick} value="Home" />
               <ResetBtn onClick={resetGame} />
-              <button className="showHint" onClick={getHint}>
-                Hint
-              </button>
-            </section>
-          </div>
-          {gameWon() && <p className="text-6xl text-green-500">YOU WIN!</p>}
-          {gameLost()}
+              {state.showHint.length > 0 ? <p className='opacity-100 lg:text-4xl md:text-5xl sm:text-4xl text-3xl text-white'>{state.showHint.charAt(0).toUpperCase() + state.showHint.slice(1)}</p> : <p className=' lg:text-4xl md:text-5xl sm:text-4xl text-3xl opacity-0'>Stuffed crusted</p>} 
+              <button className="flex justify-center items-center text-3xl text-white border-black font-extrabold border-2 border-r-6 border-b-7 cursor-pointer lg:w-50 md:w-50 sm:w-full lg:h-10 md:h-full sm:h-full h-full w-full rounded-2xl  hover:bg-white hover:text-black active:translate-y-0.5 " onClick={getHint} disabled={gameWon() || gameLost() || stop}>Hint</button>
+            </h2>
+          </section>
+          <section className="flex flex-wrap place-content-start lg:w-[80%] md:w-full sm:w-full w-full lg:h-full md:h-full sm:h-full h-full rounded-xl justify-center items-center ">
+            {alpha.split('').map((e, i) => (
+              <PickLetterBtn className='text-7xl text-white bg-black border-b-6 border-r-6  font-extrabold border-2 lg:w-30 md:w-30 sm:w-30 lg:h-30 md:h-30 sm:h-30 w-25 h-25  rounded-xl cursor-pointer active:translate-y-0.5 m-0.5' key={i} value={e} onClick={() => handleClick(e)} disabled={isDisabled|| gameWon() || gameLost()} />
+            ))}
+          </section>
         </div>
       )}
     </div>
   );
 }
-
 export default function App() {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [state, dispatch] = useReducer(AppReducer,initialState)
   const categoriesList = [
-    { id: 1, name: 'Cars', type: 'car' },
-    { id: 2, name: 'Food', type: 'food' },
-    { id: 3, name: 'Phones', type: 'phones' }
+    { name: 'Cars', type: 'car' },
+    { name: 'Food', type: 'food' },
+    { name: 'Phones', type: 'phones' }
   ];
   return (
-    <div className="grid place-items-center w-screen h-screen p-4">
-      {activeIndex === 0 && (
+    <div className="grid grid-rows-2 place-items-center w-screen h-screen">
+      {!state.activeCategory ? (
         <>
-          <h1 className="text-black text-7xl font-extrabold text-center">{categoriesList.find(c => c.id === activeIndex)?.name || 'Category'}</h1>
-          <section className="grid grid-cols-3 gap-2 w-full">
-            {categoriesList.map(({ id, name }) => (
+          <section className='grid grid-rows-2  h-full'>
+            <h1 className="grid justify-center items-center text-blue-300 text-7xl font-extrabold  w-full h-full">Hangman</h1>
+            <h2 className="grid justify-center items-center text-blue-300 text-5xl  font-bold w-full h-full">Categories</h2>
+          </section>
+          <section className="grid grid-cols-3 gap-2 h-full w-[98%]">
+            {categoriesList.map(({ name, type }) => (
               <button
-                key={id}
-                className="font-bold text-4xl border-3 w-full py-4 rounded-lg bg-blue-600 text-black border-black hover:text-white active:translate-y-0.5"
-                onClick={() => setActiveIndex(id)}
+                key={type}
+                className="font-extrabold text-4xl border-3 w-full h-fit py-4 rounded-lg bg-blue-300 text-black border-black cursor-pointer hover:text-white active:translate-y-0.5"
+                onClick={() => dispatch({ type: 'setCategory', activeCategory: type })}
               >
                 {name}
               </button>
             ))}
           </section>
         </>
-      )}
-      {activeIndex > 0 && (
-        <div className="grid place-items-center w-full h-full">
-          <HomeBtn onHomeClick={() => setActiveIndex(0)} value="Home" />
-          <Category isActive={true} isShowing={activeIndex} />
+      ) : (
+        <div className="grid place-items-center w-full max-h-full h-auto">
+            <Category isActive={true} category={state.activeCategory} onHomeClick={() => dispatch({ type:'home', activeCategory: state.activeCategory })} />
         </div>
       )}
     </div>

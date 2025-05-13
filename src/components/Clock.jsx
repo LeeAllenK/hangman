@@ -1,43 +1,44 @@
-import {useState , useEffect} from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-
-export const Clock = ({ onDisable, reset, stop })=>{
-	const [minutes , setMinutes] = useState(0);
-	const [seconds , setSeconds] = useState(0);
+export const Clock = ({ setIsDisabled, reset, setStop, stop, gameWon, gameLost }) => {
+	const [minutes, setMinutes] = useState(0);
+	const [seconds, setSeconds] = useState(0);
+	const timerRef = useRef(null);
 
 	useEffect(() => {
-		const timer = setInterval(() => {
-			setSeconds(s => s + 1)
-			if(seconds === 59){
-				setSeconds(0);
-				setMinutes(+1);
-			}
-		} ,1000)
-			if(minutes === 1 && seconds === 0 ){
-				onDisable(true);
-			 clearInterval(timer);
-			}
+		if(stop || gameWon() || gameLost()) {
+			clearInterval(timerRef.current);
+			return;
+		}
+		clearInterval(timerRef.current);
+		timerRef.current = setInterval(() => {
+			setSeconds((s) => {
+				if(s === 59) {
+					setMinutes((m) => m + 1);
+					return 0;
+				}
+				return s + 1;
+			});
+		}, 1000);
+		if(minutes === 1 && seconds === 0) {
+			setIsDisabled(true);
+			setStop(true);
+			clearInterval(timerRef.current);
+		}
+		return () => clearInterval(timerRef.current);
+	}, [stop, gameWon, gameLost,seconds,minutes]);
 
-			if(stop) {
-			clearInterval(timer)
-			};
-		return () =>{
-			clearInterval(timer);
-		};
-	} , [seconds, minutes, onDisable, stop])
 	useEffect(() => {
 		if(reset) {
+			// Stop current timer before resetting
+			clearInterval(timerRef.current);
 			setMinutes(0);
-			 setSeconds(0);
-			 onDisable(false); 
-			} 
-		}, [reset, onDisable]);
-	return(
-		<>
-			<div className='grid grid-cols-2 place-items-center border-2 text-white text-4xl font-extrabold w-full h-20 ' >{`${minutes}: ${seconds < 10 ? '0' + seconds : seconds}`}
-			{seconds > 1 && <p>Time's Up Loser</p>}
+			setSeconds(0);
+			setIsDisabled(false);
+			setStop(false);
+		}
+	}, [reset]);
 
-			</div>
-		</>
-	)
-}
+	return <h2 className='text-white'>{`${minutes}:${seconds < 10 ? '0' + seconds : seconds}`}</h2>;
+};
+///UPDATE HINT FROM FLEXING TO GRIND
