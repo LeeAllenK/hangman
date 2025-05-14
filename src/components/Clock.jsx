@@ -41,4 +41,3 @@ export const Clock = ({ setIsDisabled, reset, setStop, stop, gameWon, gameLost }
 
 	return <h2 className='text-white'>{`${minutes}:${seconds < 10 ? '0' + seconds : seconds}`}</h2>;
 };
-///UPDATE HINT FROM FLEXING TO GRIND
