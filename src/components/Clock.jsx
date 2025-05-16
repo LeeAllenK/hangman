@@ -10,6 +10,7 @@ export const Clock = ({ setIsDisabled, reset, setStop, stop, gameWon, gameLost }
 			clearInterval(timerRef.current);
 			return;
 		}
+//clear the interval
 		clearInterval(timerRef.current);
 		timerRef.current = setInterval(() => {
 			setSeconds((s) => {
@@ -30,7 +31,6 @@ export const Clock = ({ setIsDisabled, reset, setStop, stop, gameWon, gameLost }
 
 	useEffect(() => {
 		if(reset) {
-			// Stop current timer before resetting
 			clearInterval(timerRef.current);
 			setMinutes(0);
 			setSeconds(0);

@@ -33,7 +33,6 @@ const initialState = {
   reset: false,
   activeCategory:null,
 }
-// Main Game Component
 function Category({ isActive, category, onHomeClick }) {
   const [word, setWord] = useState(getRandomItem(category));
   const [guessedLetters, setGuessedLetters] = useState(initialState);
