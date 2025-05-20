@@ -6,33 +6,6 @@ import { Clock } from './components/Clock';
 import { Stickman } from './components/Stickman';
 import {AppReducer} from './AppReducer'
 
-const categories = {
-  car: ['mustang', 'ford', 'dodge'],
-  food: ['pizza', 'wings', 'fries'],
-  phones: ['apple', 'android', 'google']
-};
-const hints = {
-  mustang: 'ponies',
-  ford: 'car inventor',
-  dodge: 'evade',
-  pizza: 'stuffed crusted',
-  wings: 'hot or mild',
-  fries: 'potato slices',
-  apple: 'not an orange',
-  android: '18',
-  google: 'browse'
-};
-
-const getRandomItem = (category) => {
-  return categories[category][Math.floor(Math.random() * categories[category].length)];
-};
-const initialState = {
-  guessedLetters:[],
-  error: 0,
-  showHint: '',
-  reset: false,
-  activeCategory:null,
-}
 function Category({ isActive, category, onHomeClick }) {
   const [word, setWord] = useState(getRandomItem(category));
   const [isDisabled, setIsDisabled] = useState(false);
@@ -141,4 +114,32 @@ export default function App() {
       )}
     </div>
   );
+}
+
+const categories = {
+  car: ['mustang', 'ford', 'dodge'],
+  food: ['pizza', 'wings', 'fries'],
+  phones: ['apple', 'android', 'google']
+};
+const hints = {
+  mustang: 'ponies',
+  ford: 'car inventor',
+  dodge: 'evade',
+  pizza: 'stuffed crusted',
+  wings: 'hot or mild',
+  fries: 'potato slices',
+  apple: 'not an orange',
+  android: '18',
+  google: 'browse'
+};
+
+const getRandomItem = (category) => {
+  return categories[category][Math.floor(Math.random() * categories[category].length)];
+};
+const initialState = {
+  guessedLetters:[],
+  error: 0,
+  showHint: '',
+  reset: false,
+  activeCategory:null,
 }
