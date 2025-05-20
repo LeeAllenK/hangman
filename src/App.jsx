@@ -75,7 +75,7 @@ function Category({ isActive, category, onHomeClick }) {
         <div className="grid grid-cols-1 w-screen h-screen place-items-center font-extrabold">
           <Stickman errors={state.error} />
           <section className="grid grid-cols-3 lg:w-full sm:w-[98%] w-full place-items-center items-center text-5xl lg:mb-5 md:mb-2 sm:mb-3 mb-3 gap-1">
-            <Clock setIsDisabled={setIsDisabled} reset={state.reset} setReset={setReset} stop={stop} setStop={setStop} gameWon={gameWon} gameLost={gameLost}  />
+            <Clock setIsDisabled={setIsDisabled} reset={state.reset} dispatch={dispatch} stop={stop} setStop={setStop} gameWon={gameWon} gameLost={gameLost}  />
             <h2 className='flex justify-center w-full h-full gap-1' >
               {word.split('').map((e, i) => (
                 <span className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl ' key={i} style={{ color: state.guessedLetters.includes(e.toUpperCase()) ? 'white' : 'black' }}>
