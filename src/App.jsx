@@ -35,11 +35,7 @@ const initialState = {
 }
 function Category({ isActive, category, onHomeClick }) {
   const [word, setWord] = useState(getRandomItem(category));
-  const [guessedLetters, setGuessedLetters] = useState(initialState);
-  const [error, setError] = useState(initialState);
-  const [showHint, setShowHint] = useState(initialState);
   const [isDisabled, setIsDisabled] = useState(false);
-  const [reset, setReset] = useState(initialState);
   const [stop, setStop] = useState(false);
   const [state, dispatch] = useReducer(AppReducer,initialState)
   const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
