@@ -10,6 +10,18 @@ export function AppReducer(state,action){
 			...state,
 			activeCategory: action.activeCategory
 		}
+		case'Stop-Timer':
+		console.log('STOP','state',state,'action',action)
+		return{
+			...state,
+			stop:action.stop,
+			isDisabled:action.isDisabled
+		}
+		case 'Reset-Clock':
+		console.log('RESETCLOCK')
+		return{
+
+		}
 		case 'reset':
 		return {
 			...state,

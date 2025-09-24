@@ -5,11 +5,14 @@ import { HomeBtn } from './components/HomeBtn';
 import { Clock } from './components/Clock';
 import { Stickman } from './components/Stickman';
 import {AppReducer} from './AppReducer'
+import { hints,getRandomItem, initialState} from './data/hangmanData';
+import {ResetContext,DisabledContext, StopclockContext,StopDispatchContext} from './context/GameContext';
+
 
 function Category({ isActive, category, onHomeClick }) {
   const [word, setWord] = useState(getRandomItem(category));
-  const [isDisabled, setIsDisabled] = useState(false);
-  const [stop, setStop] = useState(false);
+  // const [isDisabled, setIsDisabled] = useState(false);
+  // const [stop, setStop] = useState(false);
   const [state, dispatch] = useReducer(AppReducer,initialState)
   const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -21,6 +24,7 @@ function Category({ isActive, category, onHomeClick }) {
       }
     }
   };
+//RESET BUTTON BUG
   const resetGame = () => {
     dispatch({
       type: 'reset',
@@ -48,7 +52,15 @@ function Category({ isActive, category, onHomeClick }) {
         <div className="grid grid-cols-1 w-screen h-screen place-items-center font-extrabold">
           <Stickman errors={state.error} />
           <section className="grid grid-cols-3 lg:w-full sm:w-[98%] w-full place-items-center items-center text-5xl lg:mb-5 md:mb-2 sm:mb-3 mb-3 gap-1">
-            <Clock setIsDisabled={setIsDisabled} reset={state.reset} dispatch={dispatch} stop={stop} setStop={setStop} gameWon={gameWon} gameLost={gameLost}  />
+          <StopclockContext.Provider  value={state.stop}>
+          <DisabledContext.Provider value={state.isDisabled}>
+          <ResetContext.Provider value={state.reset}>  
+          <StopDispatchContext.Provider value={dispatch}>
+            <Clock gameWon={gameWon} gameLost={gameLost}  />
+          </StopDispatchContext.Provider>
+          </ResetContext.Provider>
+          </DisabledContext.Provider>
+          </StopclockContext.Provider>
             <h2 className='flex justify-center w-full h-full gap-1' >
               {word.split('').map((e, i) => (
                 <span className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl ' key={i} style={{ color: state.guessedLetters.includes(e.toUpperCase()) ? 'white' : 'black' }}>
@@ -59,7 +71,7 @@ function Category({ isActive, category, onHomeClick }) {
             <h3 className='lg:text-5xl md:text-5xl sm:text-4xl text-5xl '>
               {gameWon() && <p className="text-green-500 animate-bounce">You Win!</p> }
               {gameLost() && <p className="text-red-500 animate-bounce">You Lose!</p>}
-              {stop && <p className='text-white animate-bounce'>Times Up!</p>}
+              {state.stop && <p className='text-white animate-bounce'>Times Up!</p>}
              </h3>
           </section>
           <section className="grid w-full h-fit place-items-center  ">
@@ -67,12 +79,12 @@ function Category({ isActive, category, onHomeClick }) {
               <HomeBtn onHomeClick={onHomeClick} value="Home" />
               <ResetBtn onClick={resetGame} />
               {state.showHint.length > 0 ? <p className='opacity-100 lg:text-4xl md:text-5xl sm:text-4xl text-3xl text-white'>{state.showHint.charAt(0).toUpperCase() + state.showHint.slice(1)}</p> : <p className=' lg:text-4xl md:text-5xl sm:text-4xl text-3xl opacity-0'>Stuffed crusted</p>} 
-              <button className="flex justify-center items-center text-3xl text-white border-black font-extrabold border-2 border-r-6 border-b-7 cursor-pointer lg:w-50 md:w-50 sm:w-full lg:h-10 md:h-full sm:h-full h-full w-full rounded-2xl  hover:bg-white hover:text-black active:translate-y-0.5 " onClick={getHint} disabled={gameWon() || gameLost() || stop}>Hint</button>
+              <button className="flex justify-center items-center text-3xl text-white border-black font-extrabold border-2 border-r-6 border-b-7 cursor-pointer lg:w-50 md:w-50 sm:w-full lg:h-10 md:h-full sm:h-full h-full w-full rounded-2xl  hover:bg-white hover:text-black active:translate-y-0.5 " onClick={getHint} disabled={gameWon() || gameLost() || state.stop }>Hint</button>
             </h2>
           </section>
           <section className="flex flex-wrap place-content-start lg:w-[80%] md:w-full sm:w-full w-full lg:h-full md:h-full sm:h-full h-full rounded-xl justify-center items-center ">
             {alpha.split('').map((e, i) => (
-              <PickLetterBtn className='text-7xl text-white bg-black border-b-6 border-r-6  font-extrabold border-2 lg:w-30 md:w-30 sm:w-30 lg:h-30 md:h-30 sm:h-30 w-25 h-25  rounded-xl cursor-pointer active:translate-y-0.5 m-0.5' key={i} value={e} onClick={() => handleClick(e)} disabled={isDisabled|| gameWon() || gameLost()} />
+              <PickLetterBtn className='text-7xl text-white bg-black border-b-6 border-r-6  font-extrabold border-2 lg:w-30 md:w-30 sm:w-30 lg:h-30 md:h-30 sm:h-30 w-25 h-25  rounded-xl cursor-pointer active:translate-y-0.5 m-0.5' key={i} value={e} onClick={() => handleClick(e)} disabled={state.isDisabled|| gameWon() || gameLost()} />
             ))}
           </section>
         </div>
@@ -114,32 +126,4 @@ export default function App() {
       )}
     </div>
   );
-}
-
-const categories = {
-  car: ['mustang', 'ford', 'dodge'],
-  food: ['pizza', 'wings', 'fries'],
-  phones: ['apple', 'android', 'google']
-};
-const hints = {
-  mustang: 'ponies',
-  ford: 'car inventor',
-  dodge: 'evade',
-  pizza: 'stuffed crusted',
-  wings: 'hot or mild',
-  fries: 'potato slices',
-  apple: 'not an orange',
-  android: '18',
-  google: 'browse'
-};
-
-const getRandomItem = (category) => {
-  return categories[category][Math.floor(Math.random() * categories[category].length)];
-};
-const initialState = {
-  guessedLetters:[],
-  error: 0,
-  showHint: '',
-  reset: false,
-  activeCategory:null,
 }
