@@ -23,11 +23,12 @@ export function AppReducer(state,action){
 
 		}
 		case 'reset':
+			console.log('REducerRESET')
 		return {
 			...state,
 			guessedLetters: [],
 			showHint: '',
-			error: 0,
+			error: action.error,
 			reset: action.reset,
 			word: state.word
 		}
@@ -37,6 +38,7 @@ export function AppReducer(state,action){
 			guessedLetters: action.guessedLetters
 		}
 		case 'setError':
+			console.log(action.error,state)
 		return{
 			...state,
 			error: action.error

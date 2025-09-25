@@ -15,33 +15,37 @@ function Category({ isActive, category, onHomeClick }) {
   // const [stop, setStop] = useState(false);
   const [state, dispatch] = useReducer(AppReducer,initialState)
   const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  
 
   const handleClick = (letter) => {
-    if(!state.guessedLetters.includes(letter)) {
-      dispatch({type: 'setGuessedLetters', guessedLetters: [...state.guessedLetters,letter]})
+    if(!state.guessedLetters?.includes(letter)) {
+      dispatch({ type: 'setGuessedLetters', guessedLetters: [...(state.guessedLetters || []),letter]})
       if(!word.includes(letter.toLowerCase())) {
         dispatch({type:'setError', error: state.error + 1})
+    console.log('Errors',state.error)
       }
     }
   };
 //RESET BUTTON BUG
   const resetGame = () => {
+  //RESET ERRROR BUG
     dispatch({
       type: 'reset',
       guessedLetters: state.guessedLetters,
       showHint: state.showHint,
-      setError: state.error,
+      error: state.error,
       reset: setTimeout(() => !state.reset,0)
     })
     if(state.reset){
       setWord(getRandomItem(category))
+      console.log('GET RANDOM')
      }
   };
   const getHint = () => {
     dispatch({ type: 'getHint', showHint: hints[word] || '' })
   };
   const gameWon = () => {
-    return word.split('').every((letter) => state.guessedLetters.includes(letter.toUpperCase()));
+    return word.split('').every((letter) => state.guessedLetters?.includes(letter.toUpperCase()));
   };
   const gameLost = () => {
     return state.error >= 6;
@@ -56,15 +60,15 @@ function Category({ isActive, category, onHomeClick }) {
           <DisabledContext.Provider value={state.isDisabled}>
           <ResetContext.Provider value={state.reset}>  
           <StopDispatchContext.Provider value={dispatch}>
-            <Clock gameWon={gameWon} gameLost={gameLost}  />
+            <Clock gameWon={gameWon} gameLost={gameLost}error={state.erro}  />
           </StopDispatchContext.Provider>
           </ResetContext.Provider>
           </DisabledContext.Provider>
           </StopclockContext.Provider>
             <h2 className='flex justify-center w-full h-full gap-1' >
               {word.split('').map((e, i) => (
-                <span className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl ' key={i} style={{ color: state.guessedLetters.includes(e.toUpperCase()) ? 'white' : 'black' }}>
-                  {state.guessedLetters.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
+                <span className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl ' key={i} style={{ color: state.guessedLetters?.includes(e.toUpperCase()) ? 'white' : 'black' }}>
+                  {state.guessedLetters?.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
                 </span>
               ))}
             </h2>
@@ -78,7 +82,7 @@ function Category({ isActive, category, onHomeClick }) {
             <h2 className="grid grid-cols-4 justify-around place-items-center text-7xl font-extrabold lg:w-full sm:w-full w-full sm:gap-1 gap-1 h-fit">
               <HomeBtn onHomeClick={onHomeClick} value="Home" />
               <ResetBtn onClick={resetGame} />
-              {state.showHint.length > 0 ? <p className='opacity-100 lg:text-4xl md:text-5xl sm:text-4xl text-3xl text-white'>{state.showHint.charAt(0).toUpperCase() + state.showHint.slice(1)}</p> : <p className=' lg:text-4xl md:text-5xl sm:text-4xl text-3xl opacity-0'>Stuffed crusted</p>} 
+              {state.showHint?.length > 0 ? <p className='opacity-100 lg:text-4xl md:text-5xl sm:text-4xl text-3xl text-white'>{state.showHint.charAt(0).toUpperCase() + state.showHint.slice(1)}</p> : <p className=' lg:text-4xl md:text-5xl sm:text-4xl text-3xl opacity-0'>Stuffed crusted</p>} 
               <button className="flex justify-center items-center text-3xl text-white border-black font-extrabold border-2 border-r-6 border-b-7 cursor-pointer lg:w-50 md:w-50 sm:w-full lg:h-10 md:h-full sm:h-full h-full w-full rounded-2xl  hover:bg-white hover:text-black active:translate-y-0.5 " onClick={getHint} disabled={gameWon() || gameLost() || state.stop }>Hint</button>
             </h2>
           </section>
