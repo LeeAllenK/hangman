@@ -6,7 +6,7 @@ import { Clock } from './components/Clock';
 import { Stickman } from './components/Stickman';
 import {AppReducer} from './AppReducer'
 import { hints,getRandomItem, initialState} from './data/hangmanData';
-import {ResetContext,DisabledContext, StopclockContext,StopDispatchContext} from './context/GameContext';
+import {ResetContext,DisabledContext, StopclockContext,DispatchContext,ErrorContext, GamewonContext, GamelostContext} from './context/GameContext';
 
 
 function Category({ isActive, category, onHomeClick }) {
@@ -57,13 +57,19 @@ function Category({ isActive, category, onHomeClick }) {
           <Stickman errors={state.error} />
           <section className="grid grid-cols-3 lg:w-full sm:w-[98%] w-full place-items-center items-center text-5xl lg:mb-5 md:mb-2 sm:mb-3 mb-3 gap-1">
           <StopclockContext.Provider  value={state.stop}>
-          <DisabledContext.Provider value={state.isDisabled}>
           <ResetContext.Provider value={state.reset}>  
-          <StopDispatchContext.Provider value={dispatch}>
-            <Clock gameWon={gameWon} gameLost={gameLost}error={state.erro}  />
-          </StopDispatchContext.Provider>
-          </ResetContext.Provider>
+          <DisabledContext.Provider value={state.isDisabled}>
+          <ErrorContext.Provider value={state.error}>
+          <DispatchContext.Provider value={dispatch}>
+          <GamewonContext.Provider value={gameWon}>
+          <GamelostContext.Provider value={gameLost}>
+            <Clock/>
+          </GamelostContext.Provider>
+          </GamewonContext.Provider>
+          </DispatchContext.Provider>
+          </ErrorContext.Provider>
           </DisabledContext.Provider>
+          </ResetContext.Provider>
           </StopclockContext.Provider>
             <h2 className='flex justify-center w-full h-full gap-1' >
               {word.split('').map((e, i) => (

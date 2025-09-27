@@ -6,6 +6,7 @@ export function AppReducer(state,action){
 			activeCategory: null
 		}
 		case 'setCategory':
+			console.log(action.activeCategory)
 		return{
 			...state,
 			activeCategory: action.activeCategory
