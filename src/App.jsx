@@ -56,21 +56,7 @@ function Category({ isActive, category, onHomeClick }) {
         <div className="grid grid-cols-1 w-screen h-screen place-items-center font-extrabold">
           <Stickman errors={state.error} />
           <section className="grid grid-cols-3 lg:w-full sm:w-[98%] w-full place-items-center items-center text-5xl lg:mb-5 md:mb-2 sm:mb-3 mb-3 gap-1">
-          <StopclockContext.Provider  value={state.stop}>
-          <ResetContext.Provider value={state.reset}>  
-          <DisabledContext.Provider value={state.isDisabled}>
-          <ErrorContext.Provider value={state.error}>
-          <DispatchContext.Provider value={dispatch}>
-          <GamewonContext.Provider value={gameWon}>
-          <GamelostContext.Provider value={gameLost}>
-            <Clock/>
-          </GamelostContext.Provider>
-          </GamewonContext.Provider>
-          </DispatchContext.Provider>
-          </ErrorContext.Provider>
-          </DisabledContext.Provider>
-          </ResetContext.Provider>
-          </StopclockContext.Provider>
+  
             <h2 className='flex justify-center w-full h-full gap-1' >
               {word.split('').map((e, i) => (
                 <span className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl ' key={i} style={{ color: state.guessedLetters?.includes(e.toUpperCase()) ? 'white' : 'black' }}>
@@ -131,6 +117,21 @@ export default function App() {
         </>
       ) : (
         <div className="grid place-items-center w-full max-h-full h-auto">
+            <StopclockContext.Provider value={state.stop}>
+              <ResetContext.Provider value={state.reset}>
+                <DisabledContext.Provider value={state.isDisabled}>
+                  <ErrorContext.Provider value={state.error}>
+                    <DispatchContext.Provider value={dispatch}>
+                      {/* <GamewonContext.Provider value={() => { gameWon()}}>
+                        <GamelostContext.Provider value={() => {gameLost()}}> */}
+                          <Clock />
+                        {/* </GamelostContext.Provider>
+                      </GamewonContext.Provider> */}
+                    </DispatchContext.Provider>
+                  </ErrorContext.Provider>
+                </DisabledContext.Provider>
+              </ResetContext.Provider>
+            </StopclockContext.Provider>
             <Category isActive={true} category={state.activeCategory} onHomeClick={() => dispatch({ type:'home', activeCategory: state.activeCategory })} />
         </div>
       )}

@@ -6,27 +6,23 @@ export function AppReducer(state,action){
 			activeCategory: null
 		}
 		case 'setCategory':
-			console.log(action.activeCategory)
 		return{
 			...state,
 			activeCategory: action.activeCategory
 		}
 		case'Stop-Timer':
-		console.log('STOP','state',state,'action',action)
 		return{
 			...state,
 			stop:action.stop,
 			isDisabled:action.isDisabled
 		}
 		case 'Reset-Clock':
-		console.log('RESETCLOCK')
 		return{
 			...state,
 			stop: action.stop,
 			isDisabled:action.isDisabled
 		}
 		case 'reset':
-			console.log('REducerRESET',state.reset)
 		return {
 			...state,
 			guessedLetters: [],
@@ -41,7 +37,6 @@ export function AppReducer(state,action){
 			guessedLetters: action.guessedLetters
 		}
 		case 'setError':
-			console.log(action.error,state)
 		return{
 			...state,
 			error: action.error

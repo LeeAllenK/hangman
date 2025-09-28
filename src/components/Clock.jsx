@@ -11,13 +11,10 @@ export const Clock = () => {
 	const error = useContext(ErrorContext);
 	const gameWon = useContext(GamewonContext);
 	const gameLost = useContext(GamelostContext);
-	useEffect(() => {
-		if(stop || gameWon() || gameLost()) {
-			clearInterval(timerRef.current);
-			return;
-		}
+	useEffect(() => {	
 //clear the interval
 		clearInterval(timerRef.current);
+		if(stop)return;
 		timerRef.current = setInterval(() => {
 			setSeconds((s) => {
 				if(s === 59) {
@@ -27,13 +24,14 @@ export const Clock = () => {
 				return s + 1;
 			});
 		}, 1000);
+		return () => clearInterval(timerRef.current);
+	}, [stop, gameWon, gameLost]);
+	useEffect(() => {
 		if(minutes === 0 && seconds === 5) {
-			stopDispatch({type:'Stop-Timer',stop:true,isDisabled:true})
+			stopDispatch({ type: 'Stop-Timer', stop: true, isDisabled: true });
 			clearInterval(timerRef.current);
 		}
-		return () => clearInterval(timerRef.current);
-	}, [stop, gameWon, gameLost,seconds,minutes]);
-
+	}, [minutes, seconds]);
 	useEffect(() => {
 		if(reset) {
 			clearInterval(timerRef.current);
@@ -43,5 +41,5 @@ export const Clock = () => {
 		}
 	}, [reset]);
 
-	return <h2 className='text-white'>{`${minutes}:${seconds < 10 ? '0' + seconds : seconds}`}</h2>;
+	return <h2 className='text-white font-bold text-2xl'>{`${minutes}:${seconds < 10 ? '0' + seconds : seconds}`}</h2>;
 };
