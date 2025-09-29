@@ -14,7 +14,7 @@ export const Clock = () => {
 	useEffect(() => {	
 //clear the interval
 		clearInterval(timerRef.current);
-		if(stop)return;
+		if(stop || gameWon || gameLost)return;
 		timerRef.current = setInterval(() => {
 			setSeconds((s) => {
 				if(s === 59) {
@@ -27,7 +27,7 @@ export const Clock = () => {
 		return () => clearInterval(timerRef.current);
 	}, [stop, gameWon, gameLost]);
 	useEffect(() => {
-		if(minutes === 0 && seconds === 5) {
+		if(minutes === 0 && seconds === 59) {
 			stopDispatch({ type: 'Stop-Timer', stop: true, isDisabled: true });
 			clearInterval(timerRef.current);
 		}

@@ -52,6 +52,21 @@ function Category({ isActive, category, onHomeClick }) {
   };
   return (
     <div>
+            <StopclockContext.Provider value={state.stop}>
+              <ResetContext.Provider value={state.reset}>
+                <DisabledContext.Provider value={state.isDisabled}>
+                  <ErrorContext.Provider value={state.error}>
+                    <DispatchContext.Provider value={dispatch}>
+                      <GamewonContext.Provider value={gameWon()}>
+                        <GamelostContext.Provider value={gameLost()}>
+                          <Clock/>
+                        </GamelostContext.Provider>
+                      </GamewonContext.Provider>
+                    </DispatchContext.Provider>
+                  </ErrorContext.Provider>
+                </DisabledContext.Provider>
+              </ResetContext.Provider>
+            </StopclockContext.Provider>
       {isActive && (
         <div className="grid grid-cols-1 w-screen h-screen place-items-center font-extrabold">
           <Stickman errors={state.error} />
@@ -117,21 +132,6 @@ export default function App() {
         </>
       ) : (
         <div className="grid place-items-center w-full max-h-full h-auto">
-            <StopclockContext.Provider value={state.stop}>
-              <ResetContext.Provider value={state.reset}>
-                <DisabledContext.Provider value={state.isDisabled}>
-                  <ErrorContext.Provider value={state.error}>
-                    <DispatchContext.Provider value={dispatch}>
-                      {/* <GamewonContext.Provider value={() => { gameWon()}}>
-                        <GamelostContext.Provider value={() => {gameLost()}}> */}
-                          <Clock />
-                        {/* </GamelostContext.Provider>
-                      </GamewonContext.Provider> */}
-                    </DispatchContext.Provider>
-                  </ErrorContext.Provider>
-                </DisabledContext.Provider>
-              </ResetContext.Provider>
-            </StopclockContext.Provider>
             <Category isActive={true} category={state.activeCategory} onHomeClick={() => dispatch({ type:'home', activeCategory: state.activeCategory })} />
         </div>
       )}
