@@ -5,18 +5,16 @@ import { HomeBtn } from './components/HomeBtn';
 import { Clock } from './components/Clock';
 import { Stickman } from './components/Stickman';
 import {AppReducer} from './AppReducer'
-import { hints,getRandomItem, initialState} from './data/hangmanData';
+import {getRandomItem, initialState} from './data/hangmanData';
 import {ResetContext,DisabledContext, StopclockContext,DispatchContext,ErrorContext, GamewonContext, GamelostContext} from './context/GameContext';
 
 
 function Category({ isActive, category, onHomeClick }) {
   const [word, setWord] = useState(getRandomItem(category));
-  // const [isDisabled, setIsDisabled] = useState(false);
-  // const [stop, setStop] = useState(false);
   const [state, dispatch] = useReducer(AppReducer,initialState)
   const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  
-
+  console.log(word.map(w=>w.name))
+  const w = word.map(w => w.name)
   const handleClick = (letter) => {
     if(!state.guessedLetters?.includes(letter)) {
       dispatch({ type: 'setGuessedLetters', guessedLetters: [...(state.guessedLetters || []),letter]})
@@ -42,10 +40,12 @@ function Category({ isActive, category, onHomeClick }) {
      }
   };
   const getHint = () => {
-    dispatch({ type: 'getHint', showHint: hints[word] || '' })
+    dispatch({ type: 'getHint', showHint: word.hint || '' })
+    console.log(word)
   };
   const gameWon = () => {
-    return word.split('').every((letter) => state.guessedLetters?.includes(letter.toUpperCase()));
+    if(!word) return false;
+    // return word.name.split('').every((letter) => state.guessedLetters?.includes(letter.toUpperCase()));
   };
   const gameLost = () => {
     return state.error >= 6;
@@ -71,12 +71,19 @@ function Category({ isActive, category, onHomeClick }) {
         <div className="grid grid-cols-1 w-screen h-screen place-items-center font-extrabold">
           <Stickman errors={state.error} />
           <section className="grid grid-cols-3 lg:w-full sm:w-[98%] w-full place-items-center items-center text-5xl lg:mb-5 md:mb-2 sm:mb-3 mb-3 gap-1">
-  
-            <h2 className='flex justify-center w-full h-full gap-1' >
-              {word.split('').map((e, i) => (
-                <span className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl ' key={i} style={{ color: state.guessedLetters?.includes(e.toUpperCase()) ? 'white' : 'black' }}>
-                  {state.guessedLetters?.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
-                </span>
+            <h2 className='flex flex-col justify-center w-full h-full gap-4'>
+              {w.map((wo, wordIndex) => (
+                <div key={wordIndex} className='flex gap-1 justify-center'>
+                  {wo.split('').map((e, i) => (
+                    <span
+                      key={i}
+                      className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl'
+                      style={{ color: state.guessedLetters?.includes(e.toUpperCase()) ? 'white' : 'black' }}
+                    >
+                      {state.guessedLetters?.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
+                    </span>
+                  ))}
+                </div>
               ))}
             </h2>
             <h3 className='lg:text-5xl md:text-5xl sm:text-4xl text-5xl '>
