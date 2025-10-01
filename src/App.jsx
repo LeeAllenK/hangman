@@ -1,4 +1,4 @@
-import { useState,useReducer } from 'react';
+import { useState,useReducer,useMemo } from 'react';
 import { PickLetterBtn } from './components/PickLetterBtn';
 import { ResetBtn } from './components/ResetBtn';
 import { HomeBtn } from './components/HomeBtn';
@@ -12,9 +12,10 @@ import {ResetContext,DisabledContext, StopclockContext,DispatchContext,ErrorCont
 function Category({ isActive, category, onHomeClick }) {
   const [word, setWord] = useState(getRandomItem(category));
   const [state, dispatch] = useReducer(AppReducer,initialState)
-  const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  console.log(word.map(w=>w.name))
   const w = word.map(w => w.name)
+  const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const shuffledAlpha = useMemo(() => shuffleArray(alpha.split('')),[] );
+  console.log(shuffledAlpha,'shuffleAplahbet')
   const handleClick = (letter) => {
     if(!state.guessedLetters?.includes(letter)) {
       dispatch({ type: 'setGuessedLetters', guessedLetters: [...(state.guessedLetters || []),letter]})
@@ -101,7 +102,7 @@ function Category({ isActive, category, onHomeClick }) {
             </h2>
           </section>
           <section className="flex flex-wrap place-content-start lg:w-[80%] md:w-full sm:w-full w-full lg:h-full md:h-full sm:h-full h-full rounded-xl justify-center items-center ">
-            {alpha.split('').map((e, i) => (
+            {shuffledAlpha.map((e, i) => (
               <PickLetterBtn className='text-7xl text-white bg-black border-b-6 border-r-6  font-extrabold border-2 lg:w-30 md:w-30 sm:w-30 lg:h-30 md:h-30 sm:h-30 w-25 h-25  rounded-xl cursor-pointer active:translate-y-0.5 m-0.5' key={i} value={e} onClick={() => handleClick(e)} disabled={state.isDisabled|| gameWon() || gameLost()} />
             ))}
           </section>
@@ -144,4 +145,8 @@ export default function App() {
       )}
     </div>
   );
+}
+
+function shuffleArray(arr) {
+  return [...new Set(arr)].sort(() => Math.random() - 0.5);
 }
