@@ -8,20 +8,20 @@ import {AppReducer} from './AppReducer'
 import {getRandomItem, initialState} from './data/hangmanData';
 import {ResetContext,DisabledContext, StopclockContext,DispatchContext,ErrorContext, GamewonContext, GamelostContext} from './context/GameContext';
 
-
 function Category({ isActive, category, onHomeClick }) {
   const [word, setWord] = useState(getRandomItem(category));
   const [state, dispatch] = useReducer(AppReducer,initialState)
   const w = word.map(w => w.name)
+  const wordLetters = [...new Set(w.join('').toUpperCase().split(''))];
+  console.log(w)
   const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const shuffledAlpha = useMemo(() => shuffleArray(alpha.split('')),[] );
-  console.log(shuffledAlpha,'shuffleAplahbet')
   const handleClick = (letter) => {
     if(!state.guessedLetters?.includes(letter)) {
       dispatch({ type: 'setGuessedLetters', guessedLetters: [...(state.guessedLetters || []),letter]})
-      if(!word.includes(letter.toLowerCase())) {
+      if(!wordLetters.includes(letter.toUpperCase())) {
         dispatch({type:'setError', error: state.error + 1})
-    console.log('Errors',state.error)
+    console.log('Errors',state.error,word,word.map((w,i,word) => w.name.split('').includes('O')),state.guessedLetters)
       }
     }
   };
@@ -37,7 +37,7 @@ function Category({ isActive, category, onHomeClick }) {
     })
     if(state.reset){
       setWord(getRandomItem(category))
-      console.log('GET RANDOM')
+      // console.log('GET RANDOM')
      }
   };
   const getHint = () => {
@@ -149,4 +149,14 @@ export default function App() {
 
 function shuffleArray(arr) {
   return [...new Set(arr)].sort(() => Math.random() - 0.5);
+}
+
+function getShuffledLetters(wordArray, alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+  const wordLetters = [...new Set(wordArray.join('').toUpperCase().split(''))]; // unique letters from word
+  const alphaArr = alpha.split('');
+  const distractors = shuffleArray(
+    alphaArr.filter(letter => !wordLetters.includes(letter))
+  ).slice(0, 10); // 10 random letters not in word
+  const combined = [...wordLetters, ...distractors];
+  return shuffleArray(combined);
 }

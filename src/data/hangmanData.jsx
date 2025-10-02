@@ -28,7 +28,7 @@ export const getRandomItem = (categoryType, count = 4) => {
 	const categoryObj = categories.find(cat => cat.type === categoryType);
 	if(!categoryObj || !categoryObj.items?.length) return [];
 	const shuffled = [...categoryObj.items];
-  console.log('shuffeld',shuffled)
+  // console.log('shuffeld',shuffled)
 	return shuffled.slice(0, count);
 };
 export const initialState = {
