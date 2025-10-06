@@ -5,15 +5,17 @@ import { HomeBtn } from './components/HomeBtn';
 import { Clock } from './components/Clock';
 import { Stickman } from './components/Stickman';
 import {AppReducer} from './AppReducer'
-import {getRandomItem, initialState} from './data/hangmanData';
+import {getRandomItem, initialState,categories} from './data/hangmanData';
 import {ResetContext,DisabledContext, StopclockContext,DispatchContext,ErrorContext, GamewonContext, GamelostContext} from './context/GameContext';
 
 function Category({ isActive, category, onHomeClick }) {
   const [word, setWord] = useState(getRandomItem(category));
   const [state, dispatch] = useReducer(AppReducer,initialState)
   const w = word.map(w => w.name)
+  const hint = word.map(w=>w.hint);
   const wordLetters = [...new Set(w.join('').toUpperCase().split(''))];
-  console.log(w)
+  const removeError = w.map(word => word.split('').every(letter => state.guessedLetters?.includes(letter.toUpperCase())))
+  console.log(word)
   const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const shuffledAlpha = useMemo(() => shuffleArray(alpha.split('')),[] );
   const handleClick = (letter) => {
@@ -21,8 +23,11 @@ function Category({ isActive, category, onHomeClick }) {
       dispatch({ type: 'setGuessedLetters', guessedLetters: [...(state.guessedLetters || []),letter]})
       if(!wordLetters.includes(letter.toUpperCase())) {
         dispatch({type:'setError', error: state.error + 1})
-    console.log('Errors',state.error,word,word.map((w,i,word) => w.name.split('').includes('O')),state.guessedLetters)
+      // console.log(removeError,'Errro')
       }
+      
+      console.log(removeError);
+      console.log(state.error)
     }
   };
 //RESET BUTTON BUG
@@ -41,16 +46,16 @@ function Category({ isActive, category, onHomeClick }) {
      }
   };
   const getHint = () => {
-    dispatch({ type: 'getHint', showHint: word.hint || '' })
-    console.log(word)
+    dispatch({ type: 'getHint', showHint: hint.join(',') || '' })
+    console.log(hint)
+    console.log(state.showHint)
   };
   const gameWon = () => {
-    if(!word) return false;
-    // return word.name.split('').every((letter) => state.guessedLetters?.includes(letter.toUpperCase()));
+    if(!w) return false;
+    const won = w.map(word => word.split('').every(letter=> state.guessedLetters?.includes(letter.toUpperCase())));
+    return won.every(Boolean);
   };
-  const gameLost = () => {
-    return state.error >= 6;
-  };
+  const gameLost = () => { return state.error >= 6;};
   return (
     <div>
             <StopclockContext.Provider value={state.stop}>
@@ -73,20 +78,27 @@ function Category({ isActive, category, onHomeClick }) {
           <Stickman errors={state.error} />
           <section className="grid grid-cols-3 lg:w-full sm:w-[98%] w-full place-items-center items-center text-5xl lg:mb-5 md:mb-2 sm:mb-3 mb-3 gap-1">
             <h2 className='flex flex-col justify-center w-full h-full gap-4'>
-              {w.map((wo, wordIndex) => (
-                <div key={wordIndex} className='flex gap-1 justify-center'>
-                  {wo.split('').map((e, i) => (
-                    <span
-                      key={i}
-                      className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl'
-                      style={{ color: state.guessedLetters?.includes(e.toUpperCase()) ? 'white' : 'black' }}
-                    >
-                      {state.guessedLetters?.includes(e.toUpperCase()) ? e.toUpperCase() : '_'}
-                    </span>
-                  ))}
+              {word.map((wo, wordIndex) => (
+                <div key={wordIndex} className='flex flex-col items-center gap-2'>
+                  <div className='flex gap-1 justify-center'>
+                    {wo.name.split('').map((char, charIndex) => (
+                      <span
+                        key={charIndex}
+                        className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl'
+                        style={{ color: state.guessedLetters?.includes(char.toUpperCase()) ? 'white' : 'black' }}
+                      >
+                        {state.guessedLetters?.includes(char.toUpperCase()) ? char.toUpperCase() : '_'}
+                      </span>
+                    ))}
+                  </div>
+                  <p className='lg:text-4xl md:text-5xl sm:text-4xl text-3xl text-white opacity-100'>
+                    {wo.hint}
+                  </p>
                 </div>
               ))}
             </h2>
+
+
             <h3 className='lg:text-5xl md:text-5xl sm:text-4xl text-5xl '>
               {gameWon() && <p className="text-green-500 animate-bounce">You Win!</p> }
               {gameLost() && <p className="text-red-500 animate-bounce">You Lose!</p>}
@@ -127,13 +139,13 @@ export default function App() {
             <h2 className="grid justify-center items-center text-blue-300 text-5xl  font-bold w-full h-full">Categories</h2>
           </section>
           <section className="grid grid-cols-3 gap-2 h-full w-[98%]">
-            {categoriesList.map(({ name, type }) => (
+            {categories.map(({type }) => (
               <button
                 key={type}
                 className="font-extrabold text-4xl border-3 w-full h-fit py-4 rounded-lg bg-blue-300 text-black border-black cursor-pointer hover:text-white active:translate-y-0.5"
                 onClick={() => dispatch({ type: 'setCategory', activeCategory: type })}
               >
-                {name}
+                {type}
               </button>
             ))}
           </section>
@@ -149,14 +161,4 @@ export default function App() {
 
 function shuffleArray(arr) {
   return [...new Set(arr)].sort(() => Math.random() - 0.5);
-}
-
-function getShuffledLetters(wordArray, alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-  const wordLetters = [...new Set(wordArray.join('').toUpperCase().split(''))]; // unique letters from word
-  const alphaArr = alpha.split('');
-  const distractors = shuffleArray(
-    alphaArr.filter(letter => !wordLetters.includes(letter))
-  ).slice(0, 10); // 10 random letters not in word
-  const combined = [...wordLetters, ...distractors];
-  return shuffleArray(combined);
 }

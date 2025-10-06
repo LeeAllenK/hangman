@@ -41,6 +41,11 @@ export function AppReducer(state,action){
 			...state,
 			error: action.error
 		}
+		case 'removeError':
+		return{
+			...state,
+			error: action.error	
+		}
 		case  'getHint':
 		return {
 			...state,
