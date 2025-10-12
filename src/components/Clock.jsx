@@ -41,5 +41,5 @@ export const Clock = () => {
 		}
 	}, [reset]);
 
-	return <h2 className='text-white font-bold text-2xl'>{`${minutes}:${seconds < 10 ? '0' + seconds : seconds}`}</h2>;
+	return <h2 className='text-white font-bold text-6xl'>{`${minutes}:${seconds < 10 ? '0' + seconds : seconds}`}</h2>;
 };

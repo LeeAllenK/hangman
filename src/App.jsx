@@ -14,7 +14,6 @@ function Category({ isActive, category, onHomeClick }) {
   const w = word.map(w => w.name)
   const hint = word.map(w=>w.hint);
   const wordLetters = [...new Set(w.join('').toUpperCase().split(''))];
-  const removeError = w.map(word => word.split('').every(letter => state.guessedLetters?.includes(letter.toUpperCase())))
   console.log(word)
   const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const shuffledAlpha = useMemo(() => shuffleArray(alpha.split('')),[] );
@@ -23,11 +22,7 @@ function Category({ isActive, category, onHomeClick }) {
       dispatch({ type: 'setGuessedLetters', guessedLetters: [...(state.guessedLetters || []),letter]})
       if(!wordLetters.includes(letter.toUpperCase())) {
         dispatch({type:'setError', error: state.error + 1})
-      // console.log(removeError,'Errro')
       }
-      
-      console.log(removeError);
-      console.log(state.error)
     }
   };
 //RESET BUTTON BUG
@@ -38,17 +33,17 @@ function Category({ isActive, category, onHomeClick }) {
       guessedLetters: state.guessedLetters,
       showHint: state.showHint,
       error: state.error,
+      show: false,
       reset: setTimeout(() => !state.reset,0)
     })
     if(state.reset){
       setWord(getRandomItem(category))
-      // console.log('GET RANDOM')
+      console.log('reandom')
      }
   };
   const getHint = () => {
-    dispatch({ type: 'getHint', showHint: hint.join(',') || '' })
+    dispatch({ type: 'getHint', show: !state.show})
     console.log(hint)
-    console.log(state.showHint)
   };
   const gameWon = () => {
     if(!w) return false;
@@ -77,23 +72,32 @@ function Category({ isActive, category, onHomeClick }) {
         <div className="grid grid-cols-1 w-screen h-screen place-items-center font-extrabold">
           <Stickman errors={state.error} />
           <section className="grid grid-cols-3 lg:w-full sm:w-[98%] w-full place-items-center items-center text-5xl lg:mb-5 md:mb-2 sm:mb-3 mb-3 gap-1">
-            <h2 className='flex flex-col justify-center w-full h-full gap-4'>
+            <h2 className='grid place-items-center w-full h-full gap-4'>
               {word.map((wo, wordIndex) => (
-                <div key={wordIndex} className='flex flex-col items-center gap-2'>
-                  <div className='flex gap-1 justify-center'>
+                <div key={wordIndex} className='grid place-items-center gap-2'>
+                  <div className='grid grid-flow-col auto-cols-max gap-6 justify-start place-items-end'>
                     {wo.name.split('').map((char, charIndex) => (
                       <span
                         key={charIndex}
-                        className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl'
-                        style={{ color: state.guessedLetters?.includes(char.toUpperCase()) ? 'white' : 'black' }}
+                        className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl gap-4'
+                        style={{
+                          color: state.guessedLetters?.includes(char.toUpperCase()) ? 'white' : 'black',
+                        }}
                       >
                         {state.guessedLetters?.includes(char.toUpperCase()) ? char.toUpperCase() : '_'}
                       </span>
+
                     ))}
-                  </div>
+                {state.show ?
                   <p className='lg:text-4xl md:text-5xl sm:text-4xl text-3xl text-white opacity-100'>
                     {wo.hint}
                   </p>
+                  :
+                  <p className=' lg:text-4xl md:text-5xl sm:text-4xl text-3xl text-white opacity-0'>
+                    {wo.hint}
+                  </p>
+                }
+                  </div>
                 </div>
               ))}
             </h2>
@@ -106,10 +110,9 @@ function Category({ isActive, category, onHomeClick }) {
              </h3>
           </section>
           <section className="grid w-full h-fit place-items-center  ">
-            <h2 className="grid grid-cols-4 justify-around place-items-center text-7xl font-extrabold lg:w-full sm:w-full w-full sm:gap-1 gap-1 h-fit">
+            <h2 className="grid grid-cols-3 justify-around place-items-center text-7xl font-extrabold lg:w-full sm:w-full w-full sm:gap-1 gap-1 h-fit">
               <HomeBtn onHomeClick={onHomeClick} value="Home" />
               <ResetBtn onClick={resetGame} />
-              {state.showHint?.length > 0 ? <p className='opacity-100 lg:text-4xl md:text-5xl sm:text-4xl text-3xl text-white'>{state.showHint.charAt(0).toUpperCase() + state.showHint.slice(1)}</p> : <p className=' lg:text-4xl md:text-5xl sm:text-4xl text-3xl opacity-0'>Stuffed crusted</p>} 
               <button className="flex justify-center items-center text-3xl text-white border-black font-extrabold border-2 border-r-6 border-b-7 cursor-pointer lg:w-50 md:w-50 sm:w-full lg:h-10 md:h-full sm:h-full h-full w-full rounded-2xl  hover:bg-white hover:text-black active:translate-y-0.5 " onClick={getHint} disabled={gameWon() || gameLost() || state.stop }>Hint</button>
             </h2>
           </section>

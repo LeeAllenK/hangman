@@ -27,6 +27,7 @@ export function AppReducer(state,action){
 			...state,
 			guessedLetters: [],
 			showHint: '',
+			show: action.show,
 			error: 0,
 			reset: action.reset,
 			word: state.word
@@ -47,9 +48,10 @@ export function AppReducer(state,action){
 			error: action.error	
 		}
 		case  'getHint':
+			console.log('hint')
 		return {
 			...state,
-			showHint: action.showHint
+			show: action.show
 		}
 		default: return  state;
 	}

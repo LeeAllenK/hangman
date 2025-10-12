@@ -63,6 +63,7 @@ export const initialState = {
   partRemove: [],
 	error: 0,
 	showHint: '',
+  show: false,
 	reset: false,
 	activeCategory: null,
 	stop: false,
