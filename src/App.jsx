@@ -52,7 +52,8 @@ function Category({ isActive, category, onHomeClick }) {
   };
   const gameLost = () => { return state.error >= 6;};
   return (
-    <div>
+    <div className="m-1">
+        <section className="flex flex-row justify-around">
             <StopclockContext.Provider value={state.stop}>
               <ResetContext.Provider value={state.reset}>
                 <DisabledContext.Provider value={state.isDisabled}>
@@ -68,11 +69,25 @@ function Category({ isActive, category, onHomeClick }) {
                 </DisabledContext.Provider>
               </ResetContext.Provider>
             </StopclockContext.Provider>
+              <HomeBtn onHomeClick={onHomeClick} value="Home" />
+              <ResetBtn onClick={resetGame} />
+              <button className="flex justify-center items-center text-3xl text-white border-black font-extrabold border-2 border-r-6 border-b-7 cursor-pointer lg:w-50 md:w-50 sm:w-full lg:h-10 md:h-full sm:h-full h-full w-full rounded-2xl  hover:bg-white hover:text-black active:translate-y-0.5 " onClick={getHint} disabled={gameWon() || gameLost() || state.stop }>Hint</button>
+        </section>
       {isActive && (
         <div className="grid grid-cols-1 w-screen h-screen place-items-center font-extrabold">
           <Stickman errors={state.error} />
-          <section className="grid grid-cols-3 lg:w-full sm:w-[98%] w-full place-items-center items-center text-5xl lg:mb-5 md:mb-2 sm:mb-3 mb-3 gap-1">
-            <h2 className='grid place-items-center w-full h-full gap-4'>
+          <section className="flex flex-wrap place-content-start lg:w-[80%] md:w-full sm:w-full w-full lg:h-full md:h-full sm:h-full h-full rounded-xl justify-center items-center ">
+            {shuffledAlpha.map((e, i) => (
+              <PickLetterBtn className='text-7xl text-white bg-black border-b-6 border-r-6  font-extrabold border-2 lg:w-20 md:w-30 sm:w-30 lg:h-20 md:h-30 sm:h-30 w-25 h-25  rounded-xl cursor-pointer active:translate-y-0.5 m-0.5' key={i} value={e} onClick={() => handleClick(e)} disabled={state.isDisabled|| gameWon() || gameLost()} />
+            ))}
+          </section>
+          <section className="grid grid-rows-1 lg:w-full sm:w-[98%] w-full place-items-center items-center text-5xl lg:mb-5 md:mb-2 sm:mb-3 mb-3 gap-1">
+            <h3 className='lg:text-5xl md:text-5xl sm:text-4xl text-5xl '>
+              {gameWon() && <p className="text-green-500 animate-bounce">You Win!</p> }
+              {gameLost() && <p className="text-red-500 animate-bounce">You Lose!</p>}
+              {state.stop && <p className='text-red-500 animate-bounce'>Times Up!</p>}
+             </h3>
+            <h2 className='grid grid-cols-2 place-items-center w-full h-full gap-4'>
               {word.map((wo, wordIndex) => (
                 <div key={wordIndex} className='grid place-items-center gap-2'>
                   <div className='grid grid-flow-col auto-cols-max gap-6 justify-start place-items-end'>
@@ -101,25 +116,10 @@ function Category({ isActive, category, onHomeClick }) {
                 </div>
               ))}
             </h2>
-
-
-            <h3 className='lg:text-5xl md:text-5xl sm:text-4xl text-5xl '>
-              {gameWon() && <p className="text-green-500 animate-bounce">You Win!</p> }
-              {gameLost() && <p className="text-red-500 animate-bounce">You Lose!</p>}
-              {state.stop && <p className='text-white animate-bounce'>Times Up!</p>}
-             </h3>
           </section>
           <section className="grid w-full h-fit place-items-center  ">
             <h2 className="grid grid-cols-3 justify-around place-items-center text-7xl font-extrabold lg:w-full sm:w-full w-full sm:gap-1 gap-1 h-fit">
-              <HomeBtn onHomeClick={onHomeClick} value="Home" />
-              <ResetBtn onClick={resetGame} />
-              <button className="flex justify-center items-center text-3xl text-white border-black font-extrabold border-2 border-r-6 border-b-7 cursor-pointer lg:w-50 md:w-50 sm:w-full lg:h-10 md:h-full sm:h-full h-full w-full rounded-2xl  hover:bg-white hover:text-black active:translate-y-0.5 " onClick={getHint} disabled={gameWon() || gameLost() || state.stop }>Hint</button>
             </h2>
-          </section>
-          <section className="flex flex-wrap place-content-start lg:w-[80%] md:w-full sm:w-full w-full lg:h-full md:h-full sm:h-full h-full rounded-xl justify-center items-center ">
-            {shuffledAlpha.map((e, i) => (
-              <PickLetterBtn className='text-7xl text-white bg-black border-b-6 border-r-6  font-extrabold border-2 lg:w-30 md:w-30 sm:w-30 lg:h-30 md:h-30 sm:h-30 w-25 h-25  rounded-xl cursor-pointer active:translate-y-0.5 m-0.5' key={i} value={e} onClick={() => handleClick(e)} disabled={state.isDisabled|| gameWon() || gameLost()} />
-            ))}
           </section>
         </div>
       )}

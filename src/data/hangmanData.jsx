@@ -24,7 +24,7 @@ export const categories = [
     items: [
       { name: 'APPLE', hint: 'not an orange' },
       { name: 'ANDROID', hint: '18' },
-      { name: 'GOOGLE', hint: 'browse' },
+      { name: 'GOOGLE', hint: 'browser' },
       { name: 'SAMSUNG', hint: 'Galaxy maker' },
       { name: 'NOKIA', hint: 'indestructible' }
     ]
