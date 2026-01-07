@@ -8,3 +8,4 @@ export const ErrorContext = createContext(0);
 export const GamewonContext = createContext(null);
 export const GamelostContext = createContext(null);
 export const DispatchContext = createContext(null);
+export const ActivecategoryContext = createContext(false);

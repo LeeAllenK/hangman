@@ -1,4 +1,4 @@
-import { useState,useReducer,useMemo } from 'react';
+import { useState,useReducer,useMemo,useEffect } from 'react';
 import { PickLetterBtn } from './components/PickLetterBtn';
 import { ResetBtn } from './components/ResetBtn';
 import { HomeBtn } from './components/HomeBtn';
@@ -6,15 +6,14 @@ import { Clock } from './components/Clock';
 import { Stickman } from './components/Stickman';
 import {AppReducer} from './AppReducer'
 import {getRandomItem, initialState,categories} from './data/hangmanData';
-import {ResetContext,DisabledContext, StopclockContext,DispatchContext,ErrorContext, GamewonContext, GamelostContext} from './context/GameContext';
+import {ResetContext,DisabledContext, StopclockContext,DispatchContext,ErrorContext, GamewonContext, GamelostContext, ActivecategoryContext} from './context/GameContext';
 
-function Category({ isActive, category, onHomeClick }) {
+function Category({isActive,category, onHomeClick }) {
   const [word, setWord] = useState(getRandomItem(category));
   const [state, dispatch] = useReducer(AppReducer,initialState)
   const w = word.map(w => w.name)
   const hint = word.map(w=>w.hint);
   const wordLetters = [...new Set(w.join('').toUpperCase().split(''))];
-  console.log(word)
   const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const shuffledAlpha = useMemo(() => shuffleArray(alpha.split('')),[] );
   const handleClick = (letter) => {
@@ -37,13 +36,11 @@ function Category({ isActive, category, onHomeClick }) {
       reset: setTimeout(() => !state.reset,0)
     })
     if(state.reset){
-      setWord(getRandomItem(category))
-      console.log('reandom')
+      setWord(getRandomItem(category));
      }
   };
   const getHint = () => {
     dispatch({ type: 'getHint', show: !state.show})
-    console.log(hint)
   };
   const gameWon = () => {
     if(!w) return false;
@@ -51,6 +48,13 @@ function Category({ isActive, category, onHomeClick }) {
     return won.every(Boolean);
   };
   const gameLost = () => { return state.error >= 6;};
+
+  useEffect(()=>{
+    if(isActive){
+      console.log('isActive',isActive)
+    }
+  },[state.isActive])
+
   return (
     <div className="m-1">
         <section className="flex flex-row justify-around">
@@ -75,10 +79,14 @@ function Category({ isActive, category, onHomeClick }) {
         </section>
       {isActive && (
         <div className="grid grid-cols-1 w-screen h-screen place-items-center font-extrabold">
-          <Stickman errors={state.error} />
+          <ErrorContext.Provider value={state.error}>
+          <ActivecategoryContext.Provider value={state.activeCategory}> 
+            <Stickman isActive={isActive}/>
+          </ActivecategoryContext.Provider>
+          </ErrorContext.Provider>
           <section className="flex flex-wrap place-content-start lg:w-[80%] md:w-full sm:w-full w-full lg:h-full md:h-full sm:h-full h-full rounded-xl justify-center items-center ">
             {shuffledAlpha.map((e, i) => (
-              <PickLetterBtn className='text-7xl text-white bg-black border-b-6 border-r-6  font-extrabold border-2 lg:w-20 md:w-30 sm:w-30 lg:h-20 md:h-30 sm:h-30 w-25 h-25  rounded-xl cursor-pointer active:translate-y-0.5 m-0.5' key={i} value={e} onClick={() => handleClick(e)} disabled={state.isDisabled|| gameWon() || gameLost()} />
+              <PickLetterBtn className='lg:text-7xl text-3xl text-white bg-black border-b-6 border-r-6  font-extrabold border-2 lg:w-20 md:w-25 sm:w-30 lg:h-20 md:h-25 sm:h-30 w-25 h-25  rounded-xl cursor-pointer active:translate-y-0.5 m-0.5' key={i} value={e} onClick={() => handleClick(e)} disabled={state.isDisabled|| gameWon() || gameLost()} />
             ))}
           </section>
           <section className="grid grid-rows-1 lg:w-full sm:w-[98%] w-full place-items-center items-center text-5xl lg:mb-5 md:mb-2 sm:mb-3 mb-3 gap-1">
@@ -87,14 +95,14 @@ function Category({ isActive, category, onHomeClick }) {
               {gameLost() && <p className="text-red-500 animate-bounce">You Lose!</p>}
               {state.stop && <p className='text-red-500 animate-bounce'>Times Up!</p>}
              </h3>
-            <h2 className='grid grid-cols-2 place-items-center w-full h-full gap-4'>
+            <h2 className='flex flex-col place-content-center place-items-center w-full h-full gap-`'>
               {word.map((wo, wordIndex) => (
-                <div key={wordIndex} className='grid place-items-center gap-2'>
-                  <div className='grid grid-flow-col auto-cols-max gap-6 justify-start place-items-end'>
+                <div key={wordIndex} className='flex w-full place-items-center gap-2'>
+                  <div className='grid grid-flow-col w-full gap-1 place-content-center place-center-end'>
                     {wo.name.split('').map((char, charIndex) => (
                       <span
                         key={charIndex}
-                        className='lg:text-6xl md:text-6xl sm:text-5xl text-5xl gap-4'
+                        className='lg:text-6xl md:text-6xl sm:text-6xl text-xl gap-4 w-full'
                         style={{
                           color: state.guessedLetters?.includes(char.toUpperCase()) ? 'white' : 'black',
                         }}
@@ -104,7 +112,7 @@ function Category({ isActive, category, onHomeClick }) {
 
                     ))}
                 {state.show ?
-                  <p className='lg:text-4xl md:text-5xl sm:text-4xl text-3xl text-white opacity-100'>
+                  <p className=' lg:text-4xl md:text-2xl sm:text-4xl text-3xl text-white opacity-100'>
                     {wo.hint}
                   </p>
                   :
@@ -127,41 +135,42 @@ function Category({ isActive, category, onHomeClick }) {
   );
 }
 export default function App() {
-  const [state, dispatch] = useReducer(AppReducer,initialState)
-  const categoriesList = [
-    { name: 'Cars', type: 'car' },
-    { name: 'Food', type: 'food' },
-    { name: 'Phones', type: 'phones' }
-  ];
+  const [state, dispatch] = useReducer(AppReducer,initialState);
   return (
     <div className="grid grid-rows-2 place-items-center w-screen h-screen">
       {!state.activeCategory ? (
         <>
-          <section className='grid grid-rows-2  h-full'>
+          <section className='grid grid-rows-1 place-items-center h-full max-w-full w-full  '>
             <h1 className="grid justify-center items-center text-blue-300 text-7xl font-extrabold  w-full h-full">Hangman</h1>
-            <h2 className="grid justify-center items-center text-blue-300 text-5xl  font-bold w-full h-full">Categories</h2>
+            {/* <ActivecategoryContext.Provider value={state.activeCategory}> */}
+              <Stickman/>
+            {/* </ActivecategoryContext.Provider> */}
           </section>
-          <section className="grid grid-cols-3 gap-2 h-full w-[98%]">
+          <section className="grid  place-items-center gap-2 h-full w-[98%]">
+            <h2 className="flex justify-center items-center text-blue-300 text-5xl  font-bold w-full h-full">Categories</h2>
+            <section className='grid grid-cols-3 w-full h-fit'>
             {categories.map(({type }) => (
               <button
                 key={type}
                 className="font-extrabold text-4xl border-3 w-full h-fit py-4 rounded-lg bg-blue-300 text-black border-black cursor-pointer hover:text-white active:translate-y-0.5"
-                onClick={() => dispatch({ type: 'setCategory', activeCategory: type })}
+                onClick={() => dispatch({ type: 'setCategory', activeCategory: type, isActive:true })}
               >
                 {type}
               </button>
             ))}
+            </section>
           </section>
         </>
       ) : (
         <div className="grid place-items-center w-full max-h-full h-auto">
-            <Category isActive={true} category={state.activeCategory} onHomeClick={() => dispatch({ type:'home', activeCategory: state.activeCategory })} />
+            {/* <ActivecategoryContext.Provider value={state.activeCategory}>
+  </ActivecategoryContext.Provider> */}
+            <Category isActive={state.isActive} category={state.activeCategory} onHomeClick={() => dispatch({ type:'home', activeCategory: state.activeCategory })} />
         </div>
       )}
     </div>
   );
 }
-
 function shuffleArray(arr) {
   return [...new Set(arr)].sort(() => Math.random() - 0.5);
 }

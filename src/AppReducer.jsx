@@ -1,14 +1,16 @@
 export function AppReducer(state,action){
 	switch(action.type){
 		case 'home': 
+			
 		return{
 			...state,
 			activeCategory: null
 		}
 		case 'setCategory':
+			console.log('set')
 		return{
 			...state,
-			activeCategory: action.activeCategory
+			activeCategory: action.activeCategory, isActive:action.isActive,
 		}
 		case'Stop-Timer':
 		return{

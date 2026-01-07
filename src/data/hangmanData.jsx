@@ -5,7 +5,7 @@ export const categories = [
       { name: 'MUSTANG', hint: 'ponies' },
       { name: 'FORD', hint: 'car inventor' },
       { name: 'DODGE', hint: 'evade' },
-      { name: 'TESLA', hint: 'electric vibes' },
+      { name: 'TESLA', hint: 'electric' },
       { name: 'CHEVY', hint: 'bowtie brand' }
     ]
   },
@@ -15,7 +15,7 @@ export const categories = [
       { name: 'PIZZA', hint: 'stuffed crusted' },
       { name: 'WINGS', hint: 'hot or mild' },
       { name: 'FRIES', hint: 'potato slices' },
-      { name: 'BURGER', hint: 'stacked delight' },
+      { name: 'BURGER', hint: 'double stacked' },
       { name: 'SUSHI', hint: 'rolled rice' }
     ]
   },
@@ -55,7 +55,6 @@ export const getRandomItem = (categoryType, count = 4) => {
 	const categoryObj = categories.find(cat => cat.type === categoryType);
 	if(!categoryObj || !categoryObj.items?.length) return [];
 	const shuffled = [...categoryObj.items];
-  // console.log('shuffeld',shuffled)
 	return shuffled.slice(0, count);
 };
 export const initialState = {
@@ -66,6 +65,7 @@ export const initialState = {
   show: false,
 	reset: false,
 	activeCategory: null,
+  isActive: false,
 	stop: false,
 	isDisabled: false,
   
