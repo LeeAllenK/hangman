@@ -4,13 +4,13 @@ export function AppReducer(state,action){
 			
 		return{
 			...state,
-			activeCategory: null
+			activeCategory: null, startTimer: action.startTimer
 		}
-		case 'setCategory':
-			console.log('set')
+		case 'start-Game':
+			console.log('startGame')
 		return{
 			...state,
-			activeCategory: action.activeCategory, isActive:action.isActive,
+			activeCategory: action.activeCategory, isActive:action.isActive, startTimer:action.startTimer
 		}
 		case'Stop-Timer':
 		return{
@@ -22,8 +22,12 @@ export function AppReducer(state,action){
 		return{
 			...state,
 			stop: action.stop,
-			isDisabled:action.isDisabled
+			isDisabled:action.isDisabled,
+			reset: action.reset,	
+			startTimer:action.startTimer
 		}
+		case 'restartClock':
+		return{...state, startTimer:action.startTimer}
 		case 'reset':
 		return {
 			...state,
@@ -32,29 +36,24 @@ export function AppReducer(state,action){
 			show: action.show,
 			error: 0,
 			reset: action.reset,
-			word: state.word
+			word: state.word,
+			startTimer: action.startTimer,
 		}
 		case 'setGuessedLetters':
 		return{
 			...state,
 			guessedLetters: action.guessedLetters
 		}
-		case 'setError':
-		return{
-			...state,
-			error: action.error
-		}
-		case 'removeError':
-		return{
-			...state,
-			error: action.error	
+		case 'setError':{
+				return{...state, error:action.error}	
 		}
 		case  'getHint':
-			console.log('hint')
-		return {
-			...state,
-			show: action.show
-		}
+			if(action.cat === 'Remove-hint'){
+				console.log('remove')
+				return{...state, show:action.show}
+			}else{
+				return {...state,show: action.show}
+			}
 		default: return  state;
 	}
 }

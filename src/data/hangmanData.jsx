@@ -1,6 +1,6 @@
 export const categories = [
   {
-    type: 'car',
+    type: 'cars',
     items: [
       { name: 'MUSTANG', hint: 'ponies' },
       { name: 'FORD', hint: 'car inventor' },
@@ -51,7 +51,7 @@ export const categories = [
   }
 ];
 
-export const getRandomItem = (categoryType, count = 4) => {
+export const getRandomItem = (categoryType, count = 3) => {
 	const categoryObj = categories.find(cat => cat.type === categoryType);
 	if(!categoryObj || !categoryObj.items?.length) return [];
 	const shuffled = [...categoryObj.items];
@@ -68,5 +68,6 @@ export const initialState = {
   isActive: false,
 	stop: false,
 	isDisabled: false,
+  startTimer: false,
   
 }

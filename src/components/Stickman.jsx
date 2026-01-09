@@ -4,7 +4,6 @@ import {ErrorContext, ActivecategoryContext} from '../context/GameContext';
 export function Stickman({isActive}) {
 	const errors = useContext(ErrorContext);
 	const activeCat = useContext(ActivecategoryContext);
-
 	return (
 		<div className="flex flex-col items-center relative w-32 h-45">
 			<div className="w-1 h-43 bg-black absolute top-2 left-0"></div>

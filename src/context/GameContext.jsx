@@ -9,3 +9,6 @@ export const GamewonContext = createContext(null);
 export const GamelostContext = createContext(null);
 export const DispatchContext = createContext(null);
 export const ActivecategoryContext = createContext(false);
+export const StartTimerContext = createContext(false);
+export const IsActiveContext = createContext(false);
+export const ActiveCategoryContext = createContext(null);
