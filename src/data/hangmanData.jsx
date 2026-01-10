@@ -2,7 +2,7 @@ export const categories = [
   {
     type: 'cars',
     items: [
-      { name: 'MUSTANG', hint: 'ponies' },
+      { name: 'MUSTANG', hint: 'pony' },
       { name: 'FORD', hint: 'car inventor' },
       { name: 'DODGE', hint: 'evade' },
       { name: 'TESLA', hint: 'electric' },
@@ -25,7 +25,7 @@ export const categories = [
       { name: 'APPLE', hint: 'not an orange' },
       { name: 'ANDROID', hint: '18' },
       { name: 'GOOGLE', hint: 'browser' },
-      { name: 'SAMSUNG', hint: 'Galaxy maker' },
+      { name: 'SAMSUNG', hint: 'Galaxy' },
       { name: 'NOKIA', hint: 'indestructible' }
     ]
   },
@@ -45,7 +45,7 @@ export const categories = [
       { name: 'SOCCER', hint: 'goal!' },
       { name: 'BASKETBALL', hint: 'slam dunk' },
       { name: 'BASEBALL', hint: 'home run' },
-      { name: 'TENNIS', hint: 'love means zero' },
+      { name: 'TENNIS', hint: 'Serina Williams' },
       { name: 'GOLF', hint: 'hole in one' }
     ]
   }
@@ -69,5 +69,4 @@ export const initialState = {
 	stop: false,
 	isDisabled: false,
   startTimer: false,
-  
 }

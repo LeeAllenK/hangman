@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef,useContext } from 'react';
-import {StopclockContext, DispatchContext,DisabledContext,ResetContext,ErrorContext,GamewonContext, GamelostContext, StartTimerContext} from '../context/GameContext';
+import {StopclockContext, DispatchContext,ResetContext,ErrorContext,GamewonContext, GamelostContext, StartTimerContext} from '../context/GameContext';
 
-export const Clock = ({startTimer,dispatch}) => {
+export const Clock = ({dispatch}) => {
 	const [minutes, setMinutes] = useState(0);
 	const [seconds, setSeconds] = useState(0);
 	const timerRef = useRef(null);
@@ -11,7 +11,7 @@ export const Clock = ({startTimer,dispatch}) => {
 	const error = useContext(ErrorContext);
 	const gameWon = useContext(GamewonContext);
 	const gameLost = useContext(GamelostContext);
-	// const startTimer = useContext(StartTimerContext);
+	const startTimer = useContext(StartTimerContext);
 	useEffect(() => {	
 //clear the interval
 		clearInterval(timerRef.current);
@@ -30,7 +30,7 @@ export const Clock = ({startTimer,dispatch}) => {
 		return () => clearInterval(timerRef.current);
 	}, [stop, gameWon, gameLost, startTimer]);
 	useEffect(() => {
-		if(minutes === 0 && seconds === 59) {
+		if(minutes === 2 && seconds === 0) {
 			stopDispatch({ type: 'Stop-Timer', stop: true, isDisabled: true });
 			clearInterval(timerRef.current);
 		}
@@ -42,6 +42,5 @@ export const Clock = ({startTimer,dispatch}) => {
 			stopDispatch({type:'Reset-Clock',stop:false,isDisabled:false,error:error,startTimer:false})
 		}
 	}, [reset]);
-
 	return <h2 className='text-white font-bold text-3xl'>{`${minutes}:${seconds < 10 ? '0' + seconds : seconds}`}</h2>;
 };

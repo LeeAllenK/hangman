@@ -1,11 +1,19 @@
 import {useContext} from 'react';
-import {ErrorContext, ActivecategoryContext} from '../context/GameContext';
+import {ErrorContext, ActivecategoryContext,StopclockContext, GamewonContext, GamelostContext} from '../context/GameContext';
 
 export function Stickman({isActive}) {
 	const errors = useContext(ErrorContext);
 	const activeCat = useContext(ActivecategoryContext);
+	const stop = useContext(StopclockContext)
+	const gameWon = useContext(GamewonContext);
+	const gameLost = useContext(GamelostContext);
 	return (
-		<div className="flex flex-col items-center relative w-32 h-45">
+		<div className="flex flex-col place-items-center  relative w-32 h-45">
+			<h3 className='flex place-items-center text-5xl w-screen h-full'>
+				{stop && <p className='w-full text-red-500 animate-bounce'>Times Up!</p>}
+				{gameWon && <p className="w-full text-green-500 animate-bounce">You Win!</p>}
+				{gameLost && <p className="w-full text-red-500 animate-bounce">You Lose!</p>}
+			</h3>
 			<div className="w-1 h-43 bg-black absolute top-2 left-0"></div>
 			<div className="w-15 h-1 bg-black absolute top-5 left-0"></div>
 			<div className={`w-12 h-12 rounded-full bg-black border-black absolute top-6 ${errors >= 1 || !isActive  ? 'opacity-100' : 'opacity-0'}`}></div> 
