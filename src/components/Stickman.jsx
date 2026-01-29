@@ -1,9 +1,9 @@
 import {useContext} from 'react';
-import {ErrorContext, ActivecategoryContext,StopclockContext, GamewonContext, GamelostContext} from '../context/GameContext';
+import {ErrorContext, ActivecategoryContext,StopclockContext, GamewonContext, GamelostContext, IsActiveContext} from '../context/GameContext';
 
-export function Stickman({isActive}) {
+export function Stickman() {
+	const isActive = useContext(IsActiveContext)
 	const errors = useContext(ErrorContext);
-	const activeCat = useContext(ActivecategoryContext);
 	const stop = useContext(StopclockContext)
 	const gameWon = useContext(GamewonContext);
 	const gameLost = useContext(GamelostContext);

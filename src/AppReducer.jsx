@@ -11,9 +11,15 @@ export function AppReducer(state,action){
 		return{...state, stop: action.stop, isDisabled:action.isDisabled}
 	//Reset clock
 		case 'Reset-Clock':
-		return{...state, stop: action.stop, isDisabled:action.isDisabled, reset: action.reset, startTimer:action.startTimer}
+		return{...state,
+				stop: action.stop, 
+				isDisabled:action.isDisabled, 
+				reset: action.reset, 
+				startTimer: action.startTimer
+		}
 	//Resets entire game
 		case 'reset':
+			console.log('reducer REset',action.reset)
 			return {...state,
 				guessedLetters: [],
 				showHint: '',

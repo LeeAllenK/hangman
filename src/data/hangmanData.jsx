@@ -50,13 +50,18 @@ export const categories = [
     ]
   }
 ];
-
 export const getRandomItem = (categoryType, count = 3) => {
-	const categoryObj = categories.find(cat => cat.type === categoryType);
-	if(!categoryObj || !categoryObj.items?.length) return [];
-	const shuffled = [...categoryObj.items];
-	return shuffled.slice(0, count);
+  const categoryObj = categories.find(cat => cat.type === categoryType);
+  if(!categoryObj || !categoryObj.items?.length) return [];
+  // Fisher–Yates shuffle used to randomize words of each category
+  const shuffled = [...categoryObj.items];
+  for(let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, count);
 };
+
 export const initialState = {
 	guessedLetters: [],
   partRemove: [],

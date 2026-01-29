@@ -9,7 +9,7 @@ import {getRandomItem, initialState,categories} from './data/hangmanData';
 import {ResetContext,DisabledContext, StopclockContext,DispatchContext,ErrorContext, GamewonContext, GamelostContext, ActiveCategoryContext, StartTimerContext, IsActiveContext} from './context/GameContext';
 
 function Category({ onHomeClick }) {
-  const category = useContext(ActiveCategoryContext)
+  const category = useContext(ActiveCategoryContext);
   const [word, setWord] = useState(getRandomItem(category));
   const [state, dispatch] = useReducer(AppReducer,initialState)
   const w = word.map(w => w.name)
@@ -38,10 +38,16 @@ function Category({ onHomeClick }) {
       reset: setTimeout(() => !state.reset,0),
       startTimer: false
     })
+    // if(state.reset){
+    //   console.log('randomize')
+    //  }
+  };
+  useEffect(() => {
     if(state.reset){
       setWord(getRandomItem(category));
-     }
-  };
+      console.log('randomize')
+      }
+  },[state.reset])
   const getHint = () => {
       dispatch({ type: 'getHint', show: !state.show})
   };
@@ -84,7 +90,9 @@ function Category({ onHomeClick }) {
           <StopclockContext.Provider value={state.stop}>
           <GamewonContext.Provider value={gameWon()}>
           <GamelostContext.Provider value={gameLost()}>
-            <Stickman isActive={isActive}/>
+          <IsActiveContext.Provider value={isActive}>
+            <Stickman/>
+          </IsActiveContext.Provider>
           </GamelostContext.Provider>
           </GamewonContext.Provider>
           </StopclockContext.Provider>
@@ -112,7 +120,7 @@ function Category({ onHomeClick }) {
                       </span>
 
                     ))}
-                {state.show && !gameWon() ?
+                {(state.show && !gameWon() && !gameLost()) ?
                   <p className='text-5xl text-white opacity-100'>
                     {wo.hint}
                   </p>

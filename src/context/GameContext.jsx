@@ -13,4 +13,3 @@ export const StartTimerContext = createContext(false);
 export const IsActiveContext = createContext(false);
 export const ActiveCategoryContext = createContext(null);
 
-
